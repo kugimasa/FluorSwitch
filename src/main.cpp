@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <chrono>
 #include "objects/sphere.h"
 #include "utils/hitable_list.h"
 #include "utils/output_file.h"
@@ -77,6 +78,12 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns)
   float progress = 0.0;
   int img_size = nx * ny;
   std::cout << "========== Render ==========" << std::endl;
+
+  // chrono変数
+  std::chrono::system_clock::time_point  start, end;
+  // 時間計測開始
+  start = std::chrono::system_clock::now();
+
   for (int j = 0; j < ny; j++) {
     for (int i = 0; i < nx; i++) {
       vec3 col(0, 0, 0);
@@ -97,7 +104,13 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns)
       drawPix(data, nx, ny, i, j, ir, ig, ib);
     }
   }
+
+  // 時間計測終了
+  end = std::chrono::system_clock::now();
   std::cout << "\n========== Finish ==========" << std::endl;
+  // 経過時間の算出
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
+  std::cout << "Rendered Time: " << elapsed / 1000.0f << "(sec)"<< std::endl;
 }
 
 int main() {
