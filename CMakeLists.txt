@@ -17,7 +17,10 @@ add_executable(rtcamp2022
                src/camera/camera.h
                src/utils/output_file.h
                src/utils/output_file.cpp
-               src/utils/my_print.h src/utils/colors.h)
+               src/utils/my_print.h
+               src/utils/colors.h
+               src/utils/aabb.h
+               src/utils/bvh.h)
 
 find_package(PNG REQUIRED)
 include_directories("../Utils/libpng")

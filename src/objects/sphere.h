@@ -11,7 +11,8 @@ class sphere : public hitable {
   sphere();
   sphere(vec3 cen, float r) : center(cen), radius(r) {};
   sphere(vec3 cen, float r, material *m) : center(cen), radius(r), mat_ptr(m) {};
-  virtual bool hit(const ray &r, float tmin, float tmax, hit_record &rec) const;
+  virtual bool hit(const ray &r, float tmin, float tmax, hit_record &rec) const override;
+  virtual bool bounding_box(float time0, float time1, aabb &box) const override;
   vec3 center;
   float radius;
   material *mat_ptr;
@@ -45,6 +46,12 @@ bool sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec) const 
   return false;
 }
 
+bool sphere::bounding_box(float t0, float t1, aabb &box) const {
+  vec3 scale = vec3(radius, radius, radius);
+  box = aabb(center - scale, center + scale);
+  return true;
+}
+
 /// 移動球
 class moving_sphere : public hitable {
  public:
@@ -57,7 +64,8 @@ class moving_sphere : public hitable {
                 time0(t0), time1(t1),
                 radius(r),
                 mat_ptr(m) {};
-  virtual bool hit(const ray &r, float tmin, float tmax, hit_record &rec) const;
+  virtual bool hit(const ray &r, float tmin, float tmax, hit_record &rec) const override;
+  virtual bool bounding_box(float t0, float t1, aabb &box) const override;
   vec3 center(float time) const;
   vec3 center0, center1;
   float time0, time1;
@@ -99,4 +107,13 @@ bool moving_sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec)
   }
   return false;
 }
+
+bool moving_sphere::bounding_box(float t0, float t1, aabb &box) const {
+  vec3 scale = vec3(radius, radius, radius);
+  aabb box0(center(t0) - scale, center(t0) + scale);
+  aabb box1(center(t1) - scale, center(t1) + scale);
+  box = surrounding_box(box0, box1);
+  return true;
+}
+
 #endif //RAY_OBJECTS_SPHERE_H_

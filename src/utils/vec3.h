@@ -149,5 +149,6 @@ inline vec3 unit_vector(vec3 v) {
   return v / v.length();
 }
 
+static const vec3 ZERO_VEC3 (0.0f, 0.0f, 0.0f);
 static const vec3 Y_UP (0.0f, 1.0f, 0.0f);
 #endif //RAY_SRC_UTILS_VEC3_H_
