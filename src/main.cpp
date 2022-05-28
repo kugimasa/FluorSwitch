@@ -1,7 +1,3 @@
-//
-// Created by kugimasa on 2021/04/10.
-//
-
 #include <iostream>
 #include <chrono>
 #include "objects/sphere.h"

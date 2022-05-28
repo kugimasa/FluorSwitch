@@ -1,7 +1,3 @@
-//
-// Created by kugimasa on 2021/11/23.
-//
-
 #include "output_file.h"
 #include "my_print.h"
 

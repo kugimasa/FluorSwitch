@@ -1,7 +1,3 @@
-//
-// Created by kugimasa on 2021/11/23.
-//
-
 #ifndef RAY_UTILS_MY_PRINT_H_
 #define RAY_UTILS_MY_PRINT_H_
 

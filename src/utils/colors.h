@@ -1,7 +1,3 @@
-//
-// Created by kugimasa on 2021/12/21.
-//
-
 #ifndef RAY_SRC_UTILS_COLORS_H_
 #define RAY_SRC_UTILS_COLORS_H_
 

@@ -1,6 +1,3 @@
-//
-// Created by kugimasa on 2021/04/10.
-//
 // Using the code of Ray Tracing in One Weekend
 // https://raytracing.github.io/books/RayTracingInOneWeekend.html
 

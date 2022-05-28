@@ -1,7 +1,3 @@
-//
-// Created by kugimasa on 2021/11/23.
-//
-
 #ifndef RAY_UTILS_OUTPUT_FILE_H_
 #define RAY_UTILS_OUTPUT_FILE_H_
 
