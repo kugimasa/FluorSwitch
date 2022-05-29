@@ -20,7 +20,8 @@ add_executable(rtcamp2022
                src/utils/my_print.h
                src/utils/colors.h
                src/utils/aabb.h
-               src/utils/bvh.h)
+               src/utils/bvh.h
+               src/utils/util_funcs.h)
 
 find_package(PNG REQUIRED)
 include_directories("../Utils/libpng")

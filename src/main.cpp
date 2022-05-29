@@ -8,9 +8,9 @@
 #include "camera/camera.h"
 #include "material/material.h"
 
-vec3 color(const ray &r, hitable *world, int depth) {
+vec3 color(const ray &r, const hitable &world, int depth) {
   hit_record rec;
-  if (world->hit(r, 0.001, MAXFLOAT, rec)) {
+  if (world.hit(r, 0.001, MAXFLOAT, rec)) {
     ray scattered;
     vec3 attenuation;
     /// 再起処理
@@ -20,7 +20,7 @@ vec3 color(const ray &r, hitable *world, int depth) {
       return BLACK;
     }
   }
-  /// 背景色(グラデーション)の描画
+    /// 背景色(グラデーション)の描画
   else {
     vec3 unit_direction = unit_vector(r.direction());
     float t = 0.5 * (unit_direction.y() + 1.0);
@@ -33,9 +33,9 @@ void flush_progress(float progress) {
   std::cout << "\r [";
   int pos = bar_width * progress;
   for (int i = 0; i < bar_width; ++i) {
-    if (i < pos) std::cout <<  "=";
-    else if (i == pos) std::cout <<  ">";
-    else std::cout <<  " ";
+    if (i < pos) std::cout << "=";
+    else if (i == pos) std::cout << ">";
+    else std::cout << " ";
   }
   std::cout << "] " << int(progress * 100.0) << " %" << std::flush;
 }
@@ -43,40 +43,43 @@ void flush_progress(float progress) {
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
              unsigned int x, unsigned int y,
-             unsigned int r, unsigned int g, unsigned int b)
-{
+             unsigned int r, unsigned int g, unsigned int b) {
   unsigned char *p;
   p = data + (h - y) * w * 3 + x * 3;
-  p[0] = (unsigned char)r;
-  p[1] = (unsigned char)g;
-  p[2] = (unsigned char)b;
+  p[0] = (unsigned char) r;
+  p[1] = (unsigned char) g;
+  p[2] = (unsigned char) b;
 }
 
-void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns)
-{
+void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   /// シーンデータ
-  /// オブジェクトデータ
-  hitable *list[2];
-  list[0] = new moving_sphere(vec3(-0.5, 0, -1),vec3(0.5, 0, -1),
-                              0.0, 1.0, 0.5,
-                              new lambertian(KUGI_COLOR));
-  list[1] = new sphere(vec3(0, -100.5, -1), 100, new lambertian(GREY));
-  hitable *world = new hitable_list(list, 2);
+  hitable_list world;
+
+  /// マテリアル
+  auto ground_mat = make_shared<lambertian>(GREY);
+  auto sphere_mat = make_shared<lambertian>(KUGI_COLOR);
+
+  /// オブジェクト
+  world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, ground_mat));
+  world.add(make_shared<moving_sphere>(vec3(-0.5, 0, -1), vec3(0.5, 0, -1),
+                                       0.0, 1.0, 0.5,
+                                       sphere_mat));
+
   /// カメラ設定
   vec3 lookfrom(0.0, 1.0, 5.0);
-  vec3 lookat(0.0, 0.0,-10.0);
-  float vfov {49.0f};
-  float dist_to_focus {10.0f};
-  float aperture {0.0f};
-  float aspect = float(nx)/float(ny);
-  float t0 {0.0f}, t1 {1.0f};
+  vec3 lookat(0.0, 0.0, -10.0);
+  float vfov{49.0f};
+  float dist_to_focus{10.0f};
+  float aperture{0.0f};
+  float aspect = float(nx) / float(ny);
+  float t0{0.0f}, t1{1.0f};
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
   float progress = 0.0;
   int img_size = nx * ny;
   std::cout << "========== Render ==========" << std::endl;
 
   // chrono変数
-  std::chrono::system_clock::time_point  start, end;
+  std::chrono::system_clock::time_point start, end;
   // 時間計測開始
   start = std::chrono::system_clock::now();
 
@@ -95,7 +98,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns)
       int ir = int(255.99 * col[0]);
       int ig = int(255.99 * col[1]);
       int ib = int(255.99 * col[2]);
-      progress = float (i + j * nx) / img_size;
+      progress = float(i + j * nx) / img_size;
       flush_progress(progress);
       drawPix(data, nx, ny, i, j, ir, ig, ib);
     }
@@ -105,8 +108,8 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns)
   end = std::chrono::system_clock::now();
   std::cout << "\n========== Finish ==========" << std::endl;
   // 経過時間の算出
-  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count();
-  std::cout << "Rendered Time: " << elapsed / 1000.0f << "(sec)"<< std::endl;
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  std::cout << "Rendered Time: " << elapsed / 1000.0f << "(sec)" << std::endl;
 }
 
 int main() {
@@ -120,7 +123,7 @@ int main() {
   output.height = ny;
   output.ch = 3;
   /// Malloc
-  output.data = (unsigned char*)malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
+  output.data = (unsigned char *) malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
   if (output.data == NULL) {
     error_print("Memory Allocation Error");
     return -1;
