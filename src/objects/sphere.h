@@ -16,6 +16,14 @@ class sphere : public hitable {
   vec3 center;
   float radius;
   shared_ptr<material> mat_ptr;
+
+ private:
+  static void get_sphere_uv(const point3 &p, double &u, double &v) {
+    auto theta = acos(-p.y());
+    auto phi = atan2(-p.z(), p.x()) + PI;
+    u = phi / (2 * PI);
+    v = theta / PI;
+  }
 };
 
 bool sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
@@ -38,7 +46,9 @@ bool sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec) const 
     if (t_min < temp && temp < t_max) {
       rec.t = temp;
       rec.p = r.point_at_parameter(rec.t);
+      // TODO: 法線反転
       rec.normal = (rec.p - center) / radius;
+      get_sphere_uv(rec.normal, rec.u, rec.v);
       rec.mat_ptr = mat_ptr;
       return true;
     }

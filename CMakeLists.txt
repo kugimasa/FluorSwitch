@@ -21,7 +21,8 @@ add_executable(rtcamp2022
                src/utils/colors.h
                src/utils/aabb.h
                src/utils/bvh.h
-               src/utils/util_funcs.h)
+               src/utils/util_funcs.h
+               src/utils/texture.h)
 
 find_package(PNG REQUIRED)
 include_directories("../Utils/libpng")

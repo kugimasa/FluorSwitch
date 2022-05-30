@@ -8,14 +8,14 @@
 #include "camera/camera.h"
 #include "material/material.h"
 
-vec3 color(const ray &r, const hitable &world, int depth) {
+vec3 ray_color(const ray &r, const hitable &world, int depth) {
   hit_record rec;
   if (world.hit(r, 0.001, MAXFLOAT, rec)) {
     ray scattered;
     vec3 attenuation;
     /// 再起処理
     if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-      return attenuation * color(scattered, world, depth + 1);
+      return attenuation * ray_color(scattered, world, depth + 1);
     } else {
       return BLACK;
     }
@@ -91,7 +91,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
         float v = float(j + drand48()) / float(ny);
         ray r = cam.get_ray(u, v);
         vec3 p = r.point_at_parameter(2.0);
-        col += color(r, world, 0);
+        col += ray_color(r, world, 0);
       }
       col /= float(ns);
       col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));

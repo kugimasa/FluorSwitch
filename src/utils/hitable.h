@@ -14,6 +14,8 @@ struct hit_record {
   vec3 p;
   vec3 normal;
   shared_ptr<material> mat_ptr;
+  double u;
+  double v;
 };
 
 class hitable {
