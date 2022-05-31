@@ -56,8 +56,8 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   hitable_list world;
 
   /// マテリアル
-  auto ground_checker = make_shared<checker_texture>(WHITE, BLUE);
-  auto ground_mat = make_shared<lambertian>(ground_checker);
+  auto pertext = make_shared<noise_texture>(KUGI_COLOR);
+  auto ground_mat = make_shared<lambertian>(pertext);
   auto sphere_mat = make_shared<lambertian>(KUGI_COLOR);
 
   /// オブジェクト

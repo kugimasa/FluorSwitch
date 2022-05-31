@@ -2,6 +2,7 @@
 #define RTCAMP2022_SRC_UTILS_TEXTURE_H_
 
 #include "util_funcs.h"
+#include "perlin.h"
 
 class texture {
  public:
@@ -45,6 +46,21 @@ class checker_texture : public texture {
  public:
   shared_ptr<texture> even;
   shared_ptr<texture> odd;
+};
+
+class noise_texture : public texture {
+ public:
+  noise_texture() {}
+
+  noise_texture(color c) : texture_color(c) {}
+
+  color value(double u, double v, const point3 &p) const override {
+    return texture_color * noise.noise(p);
+  }
+
+ public:
+  perlin noise;
+  color texture_color{WHITE};
 };
 
 #endif //RTCAMP2022_SRC_UTILS_TEXTURE_H_
