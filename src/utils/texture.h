@@ -51,16 +51,18 @@ class checker_texture : public texture {
 class noise_texture : public texture {
  public:
   noise_texture() {}
-
   noise_texture(color c) : texture_color(c) {}
+  noise_texture(color c, double sc) : texture_color(c), scale(sc) {}
 
   color value(double u, double v, const point3 &p) const override {
-    return texture_color * noise.noise(p);
+    // noise : [0,1]
+    return texture_color * 0.5 * (1.0 + noise.noise(scale * p));
   }
 
  public:
   perlin noise;
   color texture_color{WHITE};
+  double scale{1};
 };
 
 #endif //RTCAMP2022_SRC_UTILS_TEXTURE_H_

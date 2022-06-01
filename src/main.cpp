@@ -58,13 +58,13 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 
   /// マテリアル
   // auto ground_checker = make_shared<checker_texture>(WHITE, BLUE);
-  auto pertext = make_shared<noise_texture>(KUGI_COLOR);
+  auto pertext = make_shared<noise_texture>(KUGI_COLOR, 4);
   auto ground_mat = make_shared<lambertian>(GREY);
   auto sphere_mat = make_shared<lambertian>(pertext);
 
   /// オブジェクト
   world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, ground_mat));
-  world.add(make_shared<sphere>(vec3(0, 0, -1), 0.5, sphere_mat));
+  world.add(make_shared<sphere>(vec3(0, 1.5, -1), 2, sphere_mat));
 
   /// カメラ設定
   vec3 lookfrom(0.0, 1.0, 5.0);
