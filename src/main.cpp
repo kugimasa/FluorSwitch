@@ -46,6 +46,7 @@ void drawPix(unsigned char *data,
              unsigned int r, unsigned int g, unsigned int b) {
   unsigned char *p;
   p = data + (h - y) * w * 3 + x * 3;
+  // TODO: EXC_BAD_ACCESSで落ちることがある
   p[0] = (unsigned char) r;
   p[1] = (unsigned char) g;
   p[2] = (unsigned char) b;
@@ -56,15 +57,14 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   hitable_list world;
 
   /// マテリアル
+  // auto ground_checker = make_shared<checker_texture>(WHITE, BLUE);
   auto pertext = make_shared<noise_texture>(KUGI_COLOR);
-  auto ground_mat = make_shared<lambertian>(pertext);
-  auto sphere_mat = make_shared<lambertian>(KUGI_COLOR);
+  auto ground_mat = make_shared<lambertian>(GREY);
+  auto sphere_mat = make_shared<lambertian>(pertext);
 
   /// オブジェクト
   world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, ground_mat));
-  world.add(make_shared<moving_sphere>(vec3(-0.5, 0, -1), vec3(0.5, 0, -1),
-                                       0.0, 1.0, 0.5,
-                                       sphere_mat));
+  world.add(make_shared<sphere>(vec3(0, 0, -1), 0.5, sphere_mat));
 
   /// カメラ設定
   vec3 lookfrom(0.0, 1.0, 5.0);
