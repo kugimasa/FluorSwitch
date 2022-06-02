@@ -9,4 +9,6 @@ static const color WHITE(0.8, 0.8, 0.8);
 static const color RED(1, 0, 0);
 static const color GREEN(0, 1, 0);
 static const color BLUE(0, 0, 1);
+static const color CYAN(0, 1, 1);
+static const color MAGENTA(1, 0, 1);
 #endif //RAY_SRC_UTILS_COLORS_H_

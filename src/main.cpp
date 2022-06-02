@@ -58,9 +58,10 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 
   /// マテリアル
   // auto ground_checker = make_shared<checker_texture>(WHITE, BLUE);
-  auto pertext = make_shared<noise_texture>(KUGI_COLOR, 4);
+  // auto pertext = make_shared<noise_texture>(KUGI_COLOR, 4);
+  auto img_text = make_shared<image_texture>("../img/earthmap.jpeg");
   auto ground_mat = make_shared<lambertian>(GREY);
-  auto sphere_mat = make_shared<lambertian>(pertext);
+  auto sphere_mat = make_shared<lambertian>(img_text);
 
   /// オブジェクト
   world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, ground_mat));

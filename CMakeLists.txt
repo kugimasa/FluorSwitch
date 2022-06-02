@@ -23,8 +23,10 @@ add_executable(rtcamp2022
                src/utils/bvh.h
                src/utils/util_funcs.h
                src/utils/texture.h
-               src/utils/perlin.h)
+               src/utils/perlin.h
+               src/utils/rtw_stb_image.h)
 
 find_package(PNG REQUIRED)
 include_directories("../Utils/libpng")
+include_directories("../Utils/stb")
 target_link_libraries(rtcamp2022 ${PNG_LIBRARY})
