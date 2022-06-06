@@ -21,7 +21,8 @@ class sphere : public hitable {
   static void get_sphere_uv(const point3 &p, double &u, double &v) {
     auto theta = acos(-p.y());
     auto phi = atan2(-p.z(), p.x()) + PI;
-    u = phi / (2 * PI);
+    /// 回転あり
+    u = phi / (2 * PI) + 0.25;
     v = theta / PI;
   }
 };
@@ -38,6 +39,8 @@ bool sphere::hit(const ray &r, float t_min, float t_max, hit_record &rec) const 
       rec.t = temp;
       rec.p = r.point_at_parameter(rec.t);
       rec.normal = (rec.p - center) / radius;
+      // TODO: 法線反転
+      get_sphere_uv(rec.normal, rec.u, rec.v);
       rec.mat_ptr = mat_ptr;
       return true;
     }
