@@ -8,24 +8,28 @@
 #include "camera/camera.h"
 #include "material/material.h"
 
-vec3 ray_color(const ray &r, const hitable &world, int depth) {
+vec3 ray_color(const ray &r, const color &background, const hitable &world, int depth) {
   hit_record rec;
-  if (world.hit(r, 0.001, MAXFLOAT, rec)) {
-    ray scattered;
-    vec3 attenuation;
-    /// 再起処理
-    if (depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-      return attenuation * ray_color(scattered, world, depth + 1);
-    } else {
-      return BLACK;
-    }
+
+  /// レイの最大反射後
+  if (depth <= 0) {
+    return BLACK;
   }
-    /// 背景色(グラデーション)の描画
-  else {
-    vec3 unit_direction = unit_vector(r.direction());
-    float t = 0.5 * (unit_direction.y() + 1.0);
-    return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
+
+  /// 背景色
+  if (!world.hit(r, 0.001, MAXFLOAT, rec)) {
+    return background;
   }
+
+  /// レイの反射
+  ray scattered;
+  color attenuation;
+  color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+
+  if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+    return emitted;
+  /// 再起処理
+  return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
 }
 
 void flush_progress(float progress) {
@@ -67,9 +71,12 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, ground_mat));
   world.add(make_shared<sphere>(vec3(0, 0, -1), 0.5, sphere_mat));
 
+  /// 背景
+  color background = KUGI_COLOR;
+
   /// カメラ設定
-  vec3 lookfrom(0.0, 1.0, 5.0);
-  vec3 lookat(0.0, 0.0, -10.0);
+  point3 lookfrom(0.0, 1.0, 5.0);
+  point3 lookat(0.0, 0.0, -10.0);
   float vfov{49.0f};
   float dist_to_focus{10.0f};
   float aperture{0.0f};
@@ -92,8 +99,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
         float u = float(i + drand48()) / float(nx);
         float v = float(j + drand48()) / float(ny);
         ray r = cam.get_ray(u, v);
-        vec3 p = r.point_at_parameter(2.0);
-        col += ray_color(r, world, 0);
+        col += ray_color(r, background, world, 2);
       }
       col /= float(ns);
       col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));

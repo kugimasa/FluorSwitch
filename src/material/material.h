@@ -30,18 +30,12 @@ float schlick(float cosine, float ref_idx) {
   return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
 
-///rejection sampling
-vec3 random_in_unit_sphere() {
-  vec3 p;
-  do {
-    p = 2.0 * vec3(drand48(), drand48(), drand48()) - vec3(1, 1, 1);
-  } while (p.squared_length() >= 1.0);
-  return p;
-}
-
 class material {
  public:
   virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const = 0;
+  virtual color emitted(double u, double v, const point3 &p) const {
+    return BLACK;
+  };
 };
 
 /// 拡散反射面
@@ -49,9 +43,15 @@ class lambertian : public material {
  public:
   lambertian(const color &a) : albedo(make_shared<solid_color>(a)) {}
   lambertian(shared_ptr<texture> a) : albedo(a) {}
-  virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const {
-    vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-    scattered = ray(rec.p, target - rec.p, r_in.time());
+  virtual bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const {
+
+    auto scatter_direction = rec.normal + random_unit_vector();
+
+    if (scatter_direction.near_zero()) {
+      scatter_direction = rec.normal;
+    }
+
+    scattered = ray(rec.p, scatter_direction, r_in.time());
     attenuation = albedo->value(rec.u, rec.v, rec.p);
     return true;
   }

@@ -13,6 +13,7 @@ add_executable(rtcamp2022
                src/utils/ray.h
                src/utils/vec3.h
                src/material/material.h
+               src/material/light.h
                src/objects/sphere.h
                src/camera/camera.h
                src/utils/output_file.h
