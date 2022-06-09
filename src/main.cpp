@@ -1,12 +1,14 @@
 #include <iostream>
 #include <chrono>
 #include "objects/sphere.h"
+#include "objects/aarect.h"
 #include "utils/hitable_list.h"
 #include "utils/output_file.h"
 #include "utils/colors.h"
 #include "utils/my_print.h"
 #include "camera/camera.h"
 #include "material/material.h"
+#include "material/light.h"
 
 vec3 ray_color(const ray &r, const color &background, const hitable &world, int depth) {
   hit_record rec;
@@ -68,18 +70,23 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto sphere_mat = make_shared<lambertian>(img_text);
 
   /// オブジェクト
-  world.add(make_shared<sphere>(vec3(0, -100.5, -1), 100, ground_mat));
-  world.add(make_shared<sphere>(vec3(0, 0, -1), 0.5, sphere_mat));
+  world.add(make_shared<sphere>(vec3(0, -1000, -1), 1000, ground_mat));
+  world.add(make_shared<sphere>(vec3(0, 2, 0), 2, sphere_mat));
+
+  /// ライト
+  auto diff_light = make_shared<diffuse_light>(KUGI_COLOR);
+  world.add(make_shared<xy_rect>(3, 6, 1, 4, -6, diff_light));
 
   /// 背景
-  color background = KUGI_COLOR;
+  color background = BLACK;
 
   /// カメラ設定
-  point3 lookfrom(0.0, 1.0, 5.0);
-  point3 lookat(0.0, 0.0, -10.0);
-  float vfov{49.0f};
+  point3 lookfrom(26.0, 3.0, 6.0);
+  point3 lookat(0.0, 2.0, 0.0);
+  float vfov{20.0f};
   float dist_to_focus{10.0f};
   float aperture{0.0f};
+  int max_depth = 5;
   float aspect = float(nx) / float(ny);
   float t0{0.0f}, t1{1.0f};
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
@@ -99,7 +106,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
         float u = float(i + drand48()) / float(nx);
         float v = float(j + drand48()) / float(ny);
         ray r = cam.get_ray(u, v);
-        col += ray_color(r, background, world, 2);
+        col += ray_color(r, background, world, max_depth);
       }
       col /= float(ns);
       col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
@@ -123,7 +130,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 800;
   int ny = 600;
-  int ns = 100;
+  int ns = 400;
 
   /// BitMap
   BITMAPDATA_t output;

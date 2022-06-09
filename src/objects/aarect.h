@@ -4,11 +4,11 @@
 #include "../utils/util_funcs.h"
 #include "../utils/hitable.h"
 
-class xY_rect : public hitable {
+class xy_rect : public hitable {
  public:
-  xY_rect() {}
+  xy_rect() {}
 
-  xY_rect(double x_0, double x_1, double y_0, double y_1, double z, shared_ptr<material> mat)
+  xy_rect(double x_0, double x_1, double y_0, double y_1, double z, shared_ptr<material> mat)
       : x0(x_0), x1(x_1), y0(y_0), y1(y_1), k(z), mp(mat) {};
 
   bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const override;
@@ -22,7 +22,7 @@ class xY_rect : public hitable {
   double x0, x1, y0, y1, k;
 };
 
-bool xY_rect::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
+bool xy_rect::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
   auto t = (k - r.origin().z()) / r.direction().z();
   if (t < t_min || t_max < t) {
     return false;

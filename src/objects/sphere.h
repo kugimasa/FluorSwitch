@@ -22,7 +22,7 @@ class sphere : public hitable {
     auto theta = acos(-p.y());
     auto phi = atan2(-p.z(), p.x()) + PI;
     /// 回転あり
-    u = phi / (2 * PI) + 0.25;
+    u = phi / (2 * PI) + 0.1;
     v = theta / PI;
   }
 };
