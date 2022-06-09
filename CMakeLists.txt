@@ -15,6 +15,7 @@ add_executable(rtcamp2022
                src/material/material.h
                src/material/light.h
                src/objects/sphere.h
+               src/objects/aarect.h
                src/camera/camera.h
                src/utils/output_file.h
                src/utils/output_file.cpp
