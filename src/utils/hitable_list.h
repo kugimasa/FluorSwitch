@@ -19,17 +19,17 @@ class hitable_list : public hitable {
   void clear() { objects.clear(); }
   void add(shared_ptr<hitable> object) { objects.push_back(object); }
 
-  bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const override;
-  bool bounding_box(float t0, float t1, aabb &box) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool bounding_box(double t0, double t1, aabb &box) const override;
 
  public:
   std::vector<shared_ptr<hitable>> objects;
 };
 
-bool hitable_list::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
+bool hitable_list::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
   hit_record temp_rec;
   bool hit_anything = false;
-  float closest_so_far = t_max;
+  double closest_so_far = t_max;
 
   for (const auto &object: objects) {
     if (object->hit(r, t_min, closest_so_far, temp_rec)) {
@@ -42,7 +42,7 @@ bool hitable_list::hit(const ray &r, float t_min, float t_max, hit_record &rec) 
   return hit_anything;
 }
 
-bool hitable_list::bounding_box(float t0, float t1, aabb &box) const {
+bool hitable_list::bounding_box(double t0, double t1, aabb &box) const {
   // リストが空の場合、リターン
   if (objects.empty()) {
     return false;

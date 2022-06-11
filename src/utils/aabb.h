@@ -6,8 +6,8 @@
 
 #include "util_funcs.h"
 
-inline float ffmin(float a, float b) { return a < b ? a : b; }
-inline float ffmax(float a, float b) { return a > b ? a : b; }
+inline double ffmin(double a, double b) { return a < b ? a : b; }
+inline double ffmax(double a, double b) { return a > b ? a : b; }
 
 class aabb {
  public:
@@ -21,15 +21,15 @@ class aabb {
   vec3 max() const { return maximum; }
 
   // 交差判定
-  bool hit(const ray &r, float tmin, float tmax) const {
+  bool hit(const ray &r, double tmin, double tmax) const {
     for (int i = 0; i < 3; i++) {
-      float invD = 1.0f / r.direction()[i];
-      float a = (min()[i] - r.origin()[i]) * invD;
-      float b = (max()[i] - r.origin()[i]) * invD;
-      float t0 = ffmin(a, b);
-      float t1 = ffmax(a, b);
+      double invD = 1.0 / r.direction()[i];
+      double a = (min()[i] - r.origin()[i]) * invD;
+      double b = (max()[i] - r.origin()[i]) * invD;
+      double t0 = ffmin(a, b);
+      double t1 = ffmax(a, b);
       // 反転
-      if (invD < 0.0f) std::swap(t0, t1);
+      if (invD < 0.0) std::swap(t0, t1);
       tmin = ffmax(t0, tmin);
       tmax = ffmin(t1, tmax);
       if (tmax <= tmin) {

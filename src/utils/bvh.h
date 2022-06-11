@@ -7,13 +7,13 @@
 class bvh_node : public hitable {
  public:
   bvh_node() {}
-  bvh_node(const hitable_list &list, float t0, float t1)
+  bvh_node(const hitable_list &list, double t0, double t1)
       : bvh_node(list.objects, 0, list.objects.size(), t0, t1) {}
 
-  bvh_node(const std::vector<shared_ptr<hitable>> &src_objects, size_t start, size_t end, float t0, float t1);
+  bvh_node(const std::vector<shared_ptr<hitable>> &src_objects, size_t start, size_t end, double t0, double t1);
 
-  bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const override;
-  bool bounding_box(float t0, float t1, aabb &box) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool bounding_box(double t0, double t1, aabb &box) const override;
 
  public:
   // 子ノード
@@ -41,7 +41,11 @@ bool box_z_compare(const shared_ptr<hitable> a, const shared_ptr<hitable> b) {
   return box_compare(a, b, 2);
 }
 
-bvh_node::bvh_node(const std::vector<shared_ptr<hitable>> &src_objects, size_t start, size_t end, float t0, float t1) {
+bvh_node::bvh_node(const std::vector<shared_ptr<hitable>> &src_objects,
+                   size_t start,
+                   size_t end,
+                   double t0,
+                   double t1) {
 
   auto objects = src_objects;
   // チェックする軸をX,Y,Zからランダムで選択
@@ -83,12 +87,12 @@ bvh_node::bvh_node(const std::vector<shared_ptr<hitable>> &src_objects, size_t s
   box = surrounding_box(box_left, box_right);
 }
 
-bool bvh_node::bounding_box(float t0, float t1, aabb &box) const {
+bool bvh_node::bounding_box(double t0, double t1, aabb &box) const {
   box = box;
   return true;
 }
 
-bool bvh_node::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
+bool bvh_node::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
   if (!box.hit(r, t_min, t_max)) {
     return false;
   }

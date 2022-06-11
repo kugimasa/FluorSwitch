@@ -19,7 +19,7 @@ vec3 ray_color(const ray &r, const color &background, const hitable &world, int 
   }
 
   /// 背景色
-  if (!world.hit(r, 0.001, MAXFLOAT, rec)) {
+  if (!world.hit(r, 0.001, INF, rec)) {
     return background;
   }
 
@@ -34,7 +34,7 @@ vec3 ray_color(const ray &r, const color &background, const hitable &world, int 
   return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
 }
 
-void flush_progress(float progress) {
+void flush_progress(double progress) {
   int bar_width = 20;
   std::cout << "\r [";
   int pos = bar_width * progress;
@@ -83,14 +83,14 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   /// カメラ設定
   point3 lookfrom(26.0, 3.0, 6.0);
   point3 lookat(0.0, 2.0, 0.0);
-  float vfov{20.0f};
-  float dist_to_focus{10.0f};
-  float aperture{0.0f};
+  double vfov{20.0};
+  double dist_to_focus{10.0};
+  double aperture{0.0};
   int max_depth = 5;
-  float aspect = float(nx) / float(ny);
-  float t0{0.0f}, t1{1.0f};
+  double aspect = double(nx) / double(ny);
+  double t0{0.0}, t1{1.0};
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
-  float progress = 0.0;
+  double progress = 0.0;
   int img_size = nx * ny;
   std::cout << "========== Render ==========" << std::endl;
 
@@ -103,17 +103,17 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
     for (int i = 0; i < nx; i++) {
       vec3 col(0, 0, 0);
       for (int s = 0; s < ns; s++) {
-        float u = float(i + drand48()) / float(nx);
-        float v = float(j + drand48()) / float(ny);
+        double u = double(i + drand48()) / double(nx);
+        double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
         col += ray_color(r, background, world, max_depth);
       }
-      col /= float(ns);
+      col /= double(ns);
       col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
       int ir = int(255.99 * col[0]);
       int ig = int(255.99 * col[1]);
       int ib = int(255.99 * col[2]);
-      progress = float(i + j * nx) / img_size;
+      progress = double(i + j * nx) / img_size;
       flush_progress(progress);
       drawPix(data, nx, ny, i, j, ir, ig, ib);
     }
@@ -124,7 +124,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   std::cout << "\n========== Finish ==========" << std::endl;
   // 経過時間の算出
   double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-  std::cout << "Rendered Time: " << elapsed / 1000.0f << "(sec)" << std::endl;
+  std::cout << "Rendered Time: " << elapsed / 1000.0 << "(sec)" << std::endl;
 }
 
 int main() {

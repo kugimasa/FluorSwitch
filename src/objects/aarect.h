@@ -11,8 +11,8 @@ class xy_rect : public hitable {
   xy_rect(double x_0, double x_1, double y_0, double y_1, double z, shared_ptr<material> mat)
       : x0(x_0), x1(x_1), y0(y_0), y1(y_1), k(z), mp(mat) {};
 
-  bool hit(const ray &r, float t_min, float t_max, hit_record &rec) const override;
-  bool bounding_box(float time0, float time1, aabb &box) const override {
+  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool bounding_box(double time0, double time1, aabb &box) const override {
     box = aabb(point3(x0, y0, k - 0.0001), point3(x1, y1, k + 0.0001));
     return true;
   }
@@ -22,7 +22,7 @@ class xy_rect : public hitable {
   double x0, x1, y0, y1, k;
 };
 
-bool xy_rect::hit(const ray &r, float t_min, float t_max, hit_record &rec) const {
+bool xy_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
   auto t = (k - r.origin().z()) / r.direction().z();
   if (t < t_min || t_max < t) {
     return false;
