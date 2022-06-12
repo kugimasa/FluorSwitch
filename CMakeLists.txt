@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(rtcamp2022
                src/main.cpp
-               src/utils/hitable.h
-               src/utils/hitable_list.h
+               src/utils/hittable.h
+               src/utils/hittable_list.h
                src/utils/ray.h
                src/utils/vec3.h
                src/material/material.h

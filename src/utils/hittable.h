@@ -1,8 +1,8 @@
 // Using the code of Ray Tracing in One Weekend
 // https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
-#ifndef RAY_UTILS_HITABLE_H_
-#define RAY_UTILS_HITABLE_H_
+#ifndef RAY_UTILS_HITTABLE_H_
+#define RAY_UTILS_HITTABLE_H_
 
 #include "util_funcs.h"
 #include "aabb.h"
@@ -24,10 +24,10 @@ struct hit_record {
   }
 };
 
-class hitable {
+class hittable {
  public:
   virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const = 0;
   virtual bool bounding_box(double t0, double t1, aabb &box) const = 0;
 };
 
-#endif //RAY_UTILS_HITABLE_H_
+#endif //RAY_UTILS_HITTABLE_H_

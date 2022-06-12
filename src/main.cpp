@@ -2,7 +2,7 @@
 #include <chrono>
 #include "objects/sphere.h"
 #include "objects/aarect.h"
-#include "utils/hitable_list.h"
+#include "utils/hittable_list.h"
 #include "utils/output_file.h"
 #include "utils/colors.h"
 #include "utils/my_print.h"
@@ -10,7 +10,7 @@
 #include "material/material.h"
 #include "material/light.h"
 
-vec3 ray_color(const ray &r, const color &background, const hitable &world, int depth) {
+vec3 ray_color(const ray &r, const color &background, const hittable &world, int depth) {
   hit_record rec;
 
   /// レイの最大反射後
@@ -60,7 +60,7 @@ void drawPix(unsigned char *data,
 
 void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   /// シーンデータ
-  hitable_list world;
+  hittable_list world;
 
   /// マテリアル
   auto ground_checker = make_shared<checker_texture>(GREY, WHITE);

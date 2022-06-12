@@ -2,9 +2,9 @@
 #define RTCAMP2022_SRC_OBJECTS_AARECT_H_
 
 #include "../utils/util_funcs.h"
-#include "../utils/hitable.h"
+#include "../utils/hittable.h"
 
-class xy_rect : public hitable {
+class xy_rect : public hittable {
  public:
   xy_rect() {}
 

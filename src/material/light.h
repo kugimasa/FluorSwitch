@@ -2,7 +2,7 @@
 #define RTCAMP2022_SRC_MATERIAL_LIGHT_H_
 
 #include "material.h"
-#include "../utils/hitable.h"
+#include "../utils/hittable.h"
 
 class diffuse_light : public material {
  public:

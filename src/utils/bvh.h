@@ -1,28 +1,28 @@
 #ifndef RTCAMP2022_SRC_UTILS_BVH_H_
 #define RTCAMP2022_SRC_UTILS_BVH_H_
 
-#include "hitable.h"
-#include "hitable_list.h"
+#include "hittable.h"
+#include "hittable_list.h"
 
-class bvh_node : public hitable {
+class bvh_node : public hittable {
  public:
   bvh_node() {}
-  bvh_node(const hitable_list &list, double t0, double t1)
+  bvh_node(const hittable_list &list, double t0, double t1)
       : bvh_node(list.objects, 0, list.objects.size(), t0, t1) {}
 
-  bvh_node(const std::vector<shared_ptr<hitable>> &src_objects, size_t start, size_t end, double t0, double t1);
+  bvh_node(const std::vector<shared_ptr<hittable>> &src_objects, size_t start, size_t end, double t0, double t1);
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
 
  public:
   // 子ノード
-  shared_ptr<hitable> left;
-  shared_ptr<hitable> right;
+  shared_ptr<hittable> left;
+  shared_ptr<hittable> right;
   aabb box;
 };
 
-inline bool box_compare(const shared_ptr<hitable> a, const shared_ptr<hitable> b, int axis) {
+inline bool box_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b, int axis) {
   aabb box_a;
   aabb box_b;
   if (!a->bounding_box(0, 0, box_a) || !b->bounding_box(0, 0, box_b)) {
@@ -31,17 +31,17 @@ inline bool box_compare(const shared_ptr<hitable> a, const shared_ptr<hitable> b
   return box_a.min().e[axis] < box_b.min().e[axis];
 }
 
-bool box_x_compare(const shared_ptr<hitable> a, const shared_ptr<hitable> b) {
+bool box_x_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
   return box_compare(a, b, 0);
 }
-bool box_y_compare(const shared_ptr<hitable> a, const shared_ptr<hitable> b) {
+bool box_y_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
   return box_compare(a, b, 1);
 }
-bool box_z_compare(const shared_ptr<hitable> a, const shared_ptr<hitable> b) {
+bool box_z_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
   return box_compare(a, b, 2);
 }
 
-bvh_node::bvh_node(const std::vector<shared_ptr<hitable>> &src_objects,
+bvh_node::bvh_node(const std::vector<shared_ptr<hittable>> &src_objects,
                    size_t start,
                    size_t end,
                    double t0,

@@ -4,9 +4,9 @@
 #ifndef RAY_OBJECTS_SPHERE_H_
 #define RAY_OBJECTS_SPHERE_H_
 
-#include "../utils/hitable.h"
+#include "../utils/hittable.h"
 
-class sphere : public hitable {
+class sphere : public hittable {
  public:
   sphere();
   sphere(vec3 cen, double r) : center(cen), radius(r) {};
@@ -66,7 +66,7 @@ bool sphere::bounding_box(double t0, double t1, aabb &box) const {
 }
 
 /// 移動球
-class moving_sphere : public hitable {
+class moving_sphere : public hittable {
  public:
   moving_sphere() {}
   moving_sphere(vec3 cen0, vec3 cen1,

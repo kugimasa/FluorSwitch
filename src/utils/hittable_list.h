@@ -1,9 +1,9 @@
 // Using the code of Ray Tracing in One Weekend
 // https://raytracing.github.io/books/RayTracingInOneWeekend.html
 
-#ifndef RAY_UTILS_HITABLE_LIST_H_
-#define RAY_UTILS_HITABLE_LIST_H_
-#include "hitable.h"
+#ifndef RAY_UTILS_HITTABLE_LIST_H_
+#define RAY_UTILS_HITTABLE_LIST_H_
+#include "hittable.h"
 
 #include <memory>
 #include <vector>
@@ -11,22 +11,22 @@
 using std::shared_ptr;
 using std::make_shared;
 
-class hitable_list : public hitable {
+class hittable_list : public hittable {
  public:
-  hitable_list() {}
-  hitable_list(shared_ptr<hitable> object) { add(object); }
+  hittable_list() {}
+  hittable_list(shared_ptr<hittable> object) { add(object); }
 
   void clear() { objects.clear(); }
-  void add(shared_ptr<hitable> object) { objects.push_back(object); }
+  void add(shared_ptr<hittable> object) { objects.push_back(object); }
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
 
  public:
-  std::vector<shared_ptr<hitable>> objects;
+  std::vector<shared_ptr<hittable>> objects;
 };
 
-bool hitable_list::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+bool hittable_list::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
   hit_record temp_rec;
   bool hit_anything = false;
   double closest_so_far = t_max;
@@ -42,7 +42,7 @@ bool hitable_list::hit(const ray &r, double t_min, double t_max, hit_record &rec
   return hit_anything;
 }
 
-bool hitable_list::bounding_box(double t0, double t1, aabb &box) const {
+bool hittable_list::bounding_box(double t0, double t1, aabb &box) const {
   // リストが空の場合、リターン
   if (objects.empty()) {
     return false;
@@ -61,4 +61,4 @@ bool hitable_list::bounding_box(double t0, double t1, aabb &box) const {
   }
   return true;
 }
-#endif //RAY_UTILS_HITABLE_LIST_H_
+#endif //RAY_UTILS_HITTABLE_LIST_H_
