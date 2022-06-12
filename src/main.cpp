@@ -51,7 +51,7 @@ void drawPix(unsigned char *data,
              unsigned int x, unsigned int y,
              unsigned int r, unsigned int g, unsigned int b) {
   unsigned char *p;
-  p = data + (h - y) * w * 3 + x * 3;
+  p = data + (h - y - 1) * w * 3 + x * 3;
   // TODO: EXC_BAD_ACCESSで落ちることがある
   p[0] = (unsigned char) r;
   p[1] = (unsigned char) g;
