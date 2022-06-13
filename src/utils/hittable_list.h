@@ -15,9 +15,15 @@ class hittable_list : public hittable {
  public:
   hittable_list() {}
   hittable_list(shared_ptr<hittable> object) { add(object); }
+  hittable_list(shared_ptr<hittable_list> object_list) { add(object_list); }
 
   void clear() { objects.clear(); }
   void add(shared_ptr<hittable> object) { objects.push_back(object); }
+  void add(shared_ptr<hittable_list> object_list) {
+    for (shared_ptr<hittable> o: object_list->objects) {
+      objects.push_back(o);
+    }
+  }
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;

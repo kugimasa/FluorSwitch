@@ -26,7 +26,8 @@ add_executable(rtcamp2022
                src/utils/util_funcs.h
                src/utils/texture.h
                src/utils/perlin.h
-               src/utils/rtw_stb_image.h)
+               src/utils/rtw_stb_image.h
+               src/objects/cornell_box.h)
 
 find_package(PNG REQUIRED)
 include_directories("../Utils/libpng")

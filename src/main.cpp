@@ -9,6 +9,7 @@
 #include "camera/camera.h"
 #include "material/material.h"
 #include "material/light.h"
+#include "objects/cornell_box.h"
 
 vec3 ray_color(const ray &r, const color &background, const hittable &world, int depth) {
   hit_record rec;
@@ -52,7 +53,6 @@ void drawPix(unsigned char *data,
              unsigned int r, unsigned int g, unsigned int b) {
   unsigned char *p;
   p = data + (h - y - 1) * w * 3 + x * 3;
-  // TODO: EXC_BAD_ACCESSで落ちることがある
   p[0] = (unsigned char) r;
   p[1] = (unsigned char) g;
   p[2] = (unsigned char) b;
@@ -63,27 +63,35 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   hittable_list world;
 
   /// マテリアル
-  auto ground_checker = make_shared<checker_texture>(GREY, WHITE);
-  // auto pertext = make_shared<noise_texture>(KUGI_COLOR, 4);
-  auto img_text = make_shared<image_texture>("../img/chill_centered.jpg");
-  auto ground_mat = make_shared<lambertian>(ground_checker);
-  auto sphere_mat = make_shared<lambertian>(img_text);
+//  auto ground_checker = make_shared<checker_texture>(GREY, WHITE);
+//  // auto pertext = make_shared<noise_texture>(KUGI_COLOR, 4);
+//  auto img_text = make_shared<image_texture>("../img/chill_centered.jpg");
+//  auto ground_mat = make_shared<lambertian>(ground_checker);
+//  auto sphere_mat = make_shared<lambertian>(img_text);
+//
+//  /// オブジェクト
+//  world.add(make_shared<sphere>(vec3(0, -1000, -1), 1000, ground_mat));
+//  world.add(make_shared<sphere>(vec3(0, 2, 0), 2, sphere_mat));
+//
+//  /// ライト
+//  auto diff_light = make_shared<diffuse_light>(KUGI_COLOR);
+//  world.add(make_shared<xy_rect>(3, 6, 1, 4, -6, diff_light));
 
-  /// オブジェクト
-  world.add(make_shared<sphere>(vec3(0, -1000, -1), 1000, ground_mat));
-  world.add(make_shared<sphere>(vec3(0, 2, 0), 2, sphere_mat));
+  auto red = color(.65, .05, .05);
+  auto white = color(.73, .73, .73);
+  auto green = color(.12, .45, .15);
+  auto light = color(15, 15, 15);
 
-  /// ライト
-  auto diff_light = make_shared<diffuse_light>(KUGI_COLOR);
-  world.add(make_shared<xy_rect>(3, 6, 1, 4, -6, diff_light));
+  cornell_box cb = cornell_box(555, 100, red, green, white, white, white, light);
+  world.add(make_shared<hittable_list>(cb));
 
   /// 背景
   color background = BLACK;
 
   /// カメラ設定
-  point3 lookfrom(26.0, 3.0, 6.0);
-  point3 lookat(0.0, 2.0, 0.0);
-  double vfov{20.0};
+  point3 lookfrom(278.0, 278.0, -800.0);
+  point3 lookat(278.0, 278.0, 0.0);
+  double vfov{40.0};
   double dist_to_focus{10.0};
   double aperture{0.0};
   int max_depth = 5;
@@ -128,9 +136,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 }
 
 int main() {
-  int nx = 800;
+  int nx = 600;
   int ny = 600;
-  int ns = 400;
+  int ns = 100;
 
   /// BitMap
   BITMAPDATA_t output;
