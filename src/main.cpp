@@ -62,27 +62,22 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   /// シーンデータ
   hittable_list world;
 
-  /// マテリアル
-//  auto ground_checker = make_shared<checker_texture>(GREY, WHITE);
-//  // auto pertext = make_shared<noise_texture>(KUGI_COLOR, 4);
-//  auto img_text = make_shared<image_texture>("../img/chill_centered.jpg");
-//  auto ground_mat = make_shared<lambertian>(ground_checker);
-//  auto sphere_mat = make_shared<lambertian>(img_text);
-//
-//  /// オブジェクト
-//  world.add(make_shared<sphere>(vec3(0, -1000, -1), 1000, ground_mat));
-//  world.add(make_shared<sphere>(vec3(0, 2, 0), 2, sphere_mat));
-//
-//  /// ライト
-//  auto diff_light = make_shared<diffuse_light>(KUGI_COLOR);
-//  world.add(make_shared<xy_rect>(3, 6, 1, 4, -6, diff_light));
-
   auto red = color(.65, .05, .05);
   auto white = color(.73, .73, .73);
   auto green = color(.12, .45, .15);
   auto light = color(15, 15, 15);
 
-  cornell_box cb = cornell_box(555, 100, red, green, white, white, white, light);
+  /// マテリアル設定
+  auto red_mat = make_shared<lambertian>(red);
+  auto white_mat = make_shared<lambertian>(white);
+  auto green_mat = make_shared<lambertian>(green);
+  /// 光源設定
+  auto light_mat = make_shared<diffuse_light>(light);
+
+  auto img_text = make_shared<image_texture>("../img/chill.jpg");
+  auto img_mat = make_shared<lambertian>(img_text);
+
+  cornell_box cb = cornell_box(555, 100, red_mat, green_mat, white_mat, white_mat, img_mat, light_mat);
   world.add(make_shared<hittable_list>(cb));
 
   /// 背景

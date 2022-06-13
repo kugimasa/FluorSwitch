@@ -185,5 +185,7 @@ using point3 = vec3;   // 位置座標
 using color = vec3;    // カラー
 
 static const vec3 ZERO_VEC3(0.0, 0.0, 0.0);
+static const vec3 X_UP(1.0, 0.0, 0.0);
 static const vec3 Y_UP(0.0, 1.0, 0.0);
+static const vec3 Z_UP(0.0, 0.0, 1.0);
 #endif //RAY_SRC_UTILS_VEC3_H_

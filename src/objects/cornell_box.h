@@ -10,16 +10,9 @@ class cornell_box : public hittable_list {
  public:
   cornell_box() {}
   cornell_box(double box_size, double light_size,
-              color right_c, color left_c,
-              color top_c, color bottom_c,
-              color back_c, color light_c) {
-    /// マテリアル設定
-    auto right_mat = make_shared<lambertian>(right_c);
-    auto left_mat = make_shared<lambertian>(left_c);
-    auto top_mat = make_shared<lambertian>(top_c);
-    auto bottom_mat = make_shared<lambertian>(bottom_c);
-    auto back_mat = make_shared<lambertian>(back_c);
-    auto light_mat = make_shared<diffuse_light>(light_c);
+              shared_ptr<material> right_mat, shared_ptr<material> left_mat,
+              shared_ptr<material> top_mat, shared_ptr<material> bottom_mat,
+              shared_ptr<material> back_mat, shared_ptr<material> light_mat) {
 
     /// Cornell壁
     objects.push_back(make_shared<yz_rect>(0, box_size, 0, box_size, 0, right_mat));
