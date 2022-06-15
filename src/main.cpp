@@ -79,11 +79,19 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   // auto img_mat = make_shared<lambertian>(img_text);
 
   cornell_box cb = cornell_box(555, 100, red_mat, green_mat, white_mat, white_mat, white_mat, light_mat);
-
-  world.add(make_shared<box>(point3(130, 0, 65), point3(295, 165, 230), white_mat));
-  world.add(make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white_mat));
-
   world.add(make_shared<hittable_list>(cb));
+
+  shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white_mat);
+  shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white_mat);
+
+  box1 = make_shared<rotate_y>(box1, 15);
+  box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+
+  box2 = make_shared<rotate_y>(box2, -18);
+  box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+
+  world.add(box1);
+  world.add(box2);
 
   /// 背景
   color background = BLACK;
