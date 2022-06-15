@@ -2,6 +2,7 @@
 #include <chrono>
 #include "objects/sphere.h"
 #include "objects/aarect.h"
+#include "objects/box.h"
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
 #include "utils/colors.h"
@@ -74,10 +75,14 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
 
-  auto img_text = make_shared<image_texture>("../img/chill.jpg");
-  auto img_mat = make_shared<lambertian>(img_text);
+  // auto img_text = make_shared<image_texture>("../img/chill.jpg");
+  // auto img_mat = make_shared<lambertian>(img_text);
 
-  cornell_box cb = cornell_box(555, 100, red_mat, green_mat, white_mat, white_mat, img_mat, light_mat);
+  cornell_box cb = cornell_box(555, 100, red_mat, green_mat, white_mat, white_mat, white_mat, light_mat);
+
+  world.add(make_shared<box>(point3(130, 0, 65), point3(295, 165, 230), white_mat));
+  world.add(make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white_mat));
+
   world.add(make_shared<hittable_list>(cb));
 
   /// 背景

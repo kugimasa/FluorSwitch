@@ -12,11 +12,6 @@ add_executable(rtcamp2022
                src/utils/hittable_list.h
                src/utils/ray.h
                src/utils/vec3.h
-               src/material/material.h
-               src/material/light.h
-               src/objects/sphere.h
-               src/objects/aarect.h
-               src/camera/camera.h
                src/utils/output_file.h
                src/utils/output_file.cpp
                src/utils/my_print.h
@@ -27,7 +22,13 @@ add_executable(rtcamp2022
                src/utils/texture.h
                src/utils/perlin.h
                src/utils/rtw_stb_image.h
-               src/objects/cornell_box.h)
+               src/camera/camera.h
+               src/objects/aarect.h
+               src/objects/box.h
+               src/objects/cornell_box.h
+               src/objects/sphere.h
+               src/material/material.h
+               src/material/light.h)
 
 find_package(PNG REQUIRED)
 include_directories("../Utils/libpng")
