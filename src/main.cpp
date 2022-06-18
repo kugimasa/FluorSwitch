@@ -51,12 +51,24 @@ void flush_progress(double progress) {
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
              unsigned int x, unsigned int y,
-             unsigned int r, unsigned int g, unsigned int b) {
+             const color pix_color,
+             int samples_per_pixel) {
+
+  auto r = pix_color.x();
+  auto g = pix_color.y();
+  auto b = pix_color.z();
+
+  // サンプル数の平均 + ガンマ補正(gamma=2.0)
+  auto scale = 1.0 / samples_per_pixel;
+  r = sqrt(scale * r);
+  g = sqrt(scale * g);
+  b = sqrt(scale * b);
+
   unsigned char *p;
   p = data + (h - y - 1) * w * 3 + x * 3;
-  p[0] = (unsigned char) r;
-  p[1] = (unsigned char) g;
-  p[2] = (unsigned char) b;
+  p[0] = static_cast<unsigned char>(256 * clamp(r, 0.0, 0.999));
+  p[1] = static_cast<unsigned char>(256 * clamp(g, 0.0, 0.999));
+  p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
 }
 
 void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
@@ -66,7 +78,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto red = color(.65, .05, .05);
   auto white = color(.73, .73, .73);
   auto green = color(.12, .45, .15);
-  auto light = color(3, 3, 3);
+  auto light = color(7, 7, 7);
 
   /// マテリアル設定
   auto red_mat = make_shared<lambertian>(red);
@@ -125,14 +137,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
         ray r = cam.get_ray(u, v);
         col += ray_color(r, background, world, max_depth);
       }
-      col /= double(ns);
-      col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));
-      int ir = int(255.99 * col[0]);
-      int ig = int(255.99 * col[1]);
-      int ib = int(255.99 * col[2]);
       progress = double(i + j * nx) / img_size;
       flush_progress(progress);
-      drawPix(data, nx, ny, i, j, ir, ig, ib);
+      drawPix(data, nx, ny, i, j, col, ns);
     }
   }
 
