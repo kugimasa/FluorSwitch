@@ -25,6 +25,7 @@ add_executable(rtcamp2022
                src/camera/camera.h
                src/objects/aarect.h
                src/objects/box.h
+               src/objects/constant_medium.h
                src/objects/cornell_box.h
                src/objects/sphere.h
                src/material/material.h

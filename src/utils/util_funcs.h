@@ -40,5 +40,6 @@ inline int random_int(int min, int max) {
 
 #include "ray.h"
 #include "vec3.h"
+#include "colors.h"
 
 #endif //RTCAMP2022_SRC_UTILS_UTIL_FUNCS_H_

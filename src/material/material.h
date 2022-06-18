@@ -109,4 +109,20 @@ class dielectric : public material {
 
   double ref_idx;
 };
+
+class isotropic : public material {
+ public:
+  isotropic(color c) : albedo(make_shared<solid_color>(c)) {}
+  isotropic(shared_ptr<texture> a) : albedo(a) {}
+
+  bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const override {
+    // TODO: Henyey and Greensteinの位相関数
+    // 位相関数
+    scattered = ray(rec.p, random_in_unit_sphere(), r_in.time());
+    attenuation = albedo->value(rec.u, rec.v, rec.p);
+    return true;
+  };
+ public:
+  shared_ptr<texture> albedo;
+};
 #endif //RAY_MATERIAL_MATERIAL_H_

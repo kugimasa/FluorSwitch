@@ -44,12 +44,15 @@ bool xy_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) con
   if (x < x0 || x1 < x || y < y0 || y1 < y) {
     return false;
   }
+  rec.u = (x - x0) / (x1 - x0);
+  rec.v = (y - y0) / (y1 - y0);
   rec.t = t;
   auto outward_normal = vec3(0, 0, 1);
   rec.set_face_normal(r, outward_normal);
   rec.mat_ptr = mp;
   rec.p = r.point_at_parameter(t);
-  get_aa_rect_uv(tex_o, tex_e, rec.p, X_UP, Y_UP, rec.u, rec.v);
+  // TODO: 修正が必要かもしれない
+  // get_aa_rect_uv(tex_o, tex_e, rec.p, X_UP, Y_UP, rec.u, rec.v);
   return true;
 }
 
