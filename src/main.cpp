@@ -78,33 +78,26 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto red = color(.65, .05, .05);
   auto white = color(.73, .73, .73);
   auto green = color(.12, .45, .15);
+  auto blue = color(.05, .05, .65);
   auto light = color(7, 7, 7);
 
   /// マテリアル設定
   auto red_mat = make_shared<lambertian>(red);
   auto white_mat = make_shared<lambertian>(white);
   auto green_mat = make_shared<lambertian>(green);
+  auto blue_mat = make_shared<lambertian>(blue);
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
 
-  auto img_text = make_shared<image_texture>("../img/chill.jpg");
+  auto img_text = make_shared<image_texture>("../img/chill_centered.jpg");
   auto img_mat = make_shared<lambertian>(img_text);
 
-  cornell_box cb = cornell_box(555, 350, red_mat, green_mat, white_mat, white_mat, white_mat, light_mat);
+  cornell_box cb = cornell_box(555, 350, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list>(cb));
 
-  shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white_mat);
-  shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white_mat);
-
-  box1 = make_shared<rotate_y>(box1, 15);
-  box1 = make_shared<translate>(box1, vec3(265, 0, 295));
-
-  box2 = make_shared<rotate_y>(box2, -18);
-  box2 = make_shared<translate>(box2, vec3(130, 0, 65));
-
-  /// 関与媒質で書き換え
-  world.add(make_shared<constant_medium>(box1, 0.01, BLACK));
-  world.add(make_shared<constant_medium>(box2, 0.01, KUGI_COLOR));
+  auto chill_ball = make_shared<sphere>(point3(277.5, 277.5, 277.5), 150, img_mat);
+  auto chill_medium = make_shared<constant_medium>(chill_ball, 0.005, img_text);
+  world.add(chill_medium);
 
   /// 背景
   color background = BLACK;
@@ -115,7 +108,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   double vfov{40.0};
   double dist_to_focus{10.0};
   double aperture{0.0};
-  int max_depth = 4;
+  int max_depth = 50;
   double aspect = double(nx) / double(ny);
   double t0{0.0}, t1{1.0};
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
@@ -154,7 +147,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 200;
+  int ns = 10000;
 
   /// BitMap
   BITMAPDATA_t output;
