@@ -32,7 +32,14 @@ double schlick(double cosine, double ref_idx) {
 
 class material {
  public:
-  virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &attenuation, ray &scattered) const = 0;
+  virtual bool scatter(const ray &r_in, const hit_record &rec, vec3 &albedo, ray &scattered, double &pdf) const {
+    return false;
+  }
+
+  virtual double scattering_pdf(const ray &r_in, const hit_record &rec, const ray &scattered) const {
+    return 0;
+  }
+
   virtual color emitted(double u, double v, const point3 &p) const {
     return BLACK;
   };
@@ -43,7 +50,8 @@ class lambertian : public material {
  public:
   lambertian(const color &a) : albedo(make_shared<solid_color>(a)) {}
   lambertian(shared_ptr<texture> a) : albedo(a) {}
-  virtual bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const {
+
+  virtual bool scatter(const ray &r_in, const hit_record &rec, color &alb, ray &scattered, double &pdf) const {
 
     auto scatter_direction = rec.normal + random_unit_vector();
 
@@ -51,10 +59,18 @@ class lambertian : public material {
       scatter_direction = rec.normal;
     }
 
-    scattered = ray(rec.p, scatter_direction, r_in.time());
-    attenuation = albedo->value(rec.u, rec.v, rec.p);
+    scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
+    alb = albedo->value(rec.u, rec.v, rec.p);
+    // cos(theta) / PI
+    pdf = dot(rec.normal, scattered.direction()) / PI;
     return true;
   }
+
+  double scattering_pdf(const ray &r_in, const hit_record &rec, const ray &scattered) const {
+    auto cos = dot(rec.normal, unit_vector(scattered.direction()));
+    return cos < 0 ? 0 : cos / PI;
+  }
+
   shared_ptr<texture> albedo;
 };
 
@@ -115,7 +131,7 @@ class isotropic : public material {
   isotropic(color c) : albedo(make_shared<solid_color>(c)) {}
   isotropic(shared_ptr<texture> a) : albedo(a) {}
 
-  bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const override {
+  bool scatter(const ray &r_in, const hit_record &rec, color &attenuation, ray &scattered) const {
     // TODO: Henyey and Greensteinの位相関数
     // 位相関数
     scattered = ray(rec.p, random_in_unit_sphere(), r_in.time());

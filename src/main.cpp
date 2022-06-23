@@ -27,13 +27,16 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, int
 
   /// レイの反射
   ray scattered;
-  color attenuation;
   color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 
-  if (!rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+  double pdf;
+  color albedo;
+
+  if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
     return emitted;
   /// 再起処理
-  return emitted + attenuation * ray_color(scattered, background, world, depth - 1);
+  return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered)
+      * ray_color(scattered, background, world, depth - 1) / pdf;
 }
 
 void flush_progress(double progress) {
@@ -79,7 +82,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto white = color(.73, .73, .73);
   auto green = color(.12, .45, .15);
   auto blue = color(.05, .05, .65);
-  auto light = color(7, 7, 7);
+  auto light = color(3, 3, 3);
 
   /// マテリアル設定
   auto red_mat = make_shared<lambertian>(red);
@@ -89,15 +92,18 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
 
-  auto img_text = make_shared<image_texture>("../img/chill_centered.jpg");
-  auto img_mat = make_shared<lambertian>(img_text);
-
-  cornell_box cb = cornell_box(555, 350, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
+  cornell_box cb = cornell_box(555, 150, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list>(cb));
 
-  auto chill_ball = make_shared<sphere>(point3(277.5, 277.5, 277.5), 150, img_mat);
-  auto chill_medium = make_shared<constant_medium>(chill_ball, 0.005, img_text);
-  world.add(chill_medium);
+  shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white_mat);
+  box1 = make_shared<rotate_y>(box1, 15);
+  box1 = make_shared<translate>(box1, vec3(265, 0, 295));
+  world.add(box1);
+
+  shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white_mat);
+  box2 = make_shared<rotate_y>(box2, -18);
+  box2 = make_shared<translate>(box2, vec3(130, 0, 65));
+  world.add(box2);
 
   /// 背景
   color background = BLACK;
@@ -147,7 +153,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 10000;
+  int ns = 100;
 
   /// BitMap
   BITMAPDATA_t output;
