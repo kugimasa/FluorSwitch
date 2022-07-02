@@ -13,7 +13,6 @@ add_executable(rtcamp2022
                src/utils/ray.h
                src/utils/vec3.h
                src/utils/output_file.h
-               src/utils/output_file.cpp
                src/utils/my_print.h
                src/utils/colors.h
                src/utils/aabb.h
@@ -32,7 +31,4 @@ add_executable(rtcamp2022
                src/material/material.h
                src/material/light.h)
 
-find_package(PNG REQUIRED)
-include_directories("../Utils/libpng")
 include_directories("../Utils/stb")
-target_link_libraries(rtcamp2022 ${PNG_LIBRARY})

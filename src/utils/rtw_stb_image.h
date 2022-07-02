@@ -7,8 +7,10 @@
 #pragma warning (push, 0)
 #endif
 
+#define STBI_MSC_SECURE_CRT
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include "stb_image_write.h"
 
 // Restore warning levels.
 #ifdef _MSC_VER

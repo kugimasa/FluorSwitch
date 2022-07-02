@@ -120,6 +120,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
   double progress{0.0};
   int img_size = nx * ny;
+  std::cout << "PPS: " << ns << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
   // chrono変数
@@ -172,10 +173,13 @@ int main() {
   /// 描画処理
   render(output.data, nx, ny, ns);
 
-  if (pngFileEncodeWrite(&output, "output.png")) {
-    freeBitmapData(&output);
+  /// PNG出力
+  if (stbi_write_png("output.png", output.width, output.height, output.ch, output.data, output.width * output.ch)
+      != 1) {
+    error_print("Image Save Error");
     return -1;
   }
+  
   freeBitmapData(&output);
   return 0;
 }
