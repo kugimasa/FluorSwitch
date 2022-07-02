@@ -5,6 +5,7 @@
 #define RAY_MATERIAL_MATERIAL_H_
 
 #include "../utils/texture.h"
+#include "../utils/onb.h"
 
 ///reflection
 vec3 reflect(const vec3 &v, const vec3 &n) {
@@ -53,16 +54,13 @@ class lambertian : public material {
 
   virtual bool scatter(const ray &r_in, const hit_record &rec, color &alb, ray &scattered, double &pdf) const {
 
-    auto scatter_direction = rec.normal + random_unit_vector();
-
-    if (scatter_direction.near_zero()) {
-      scatter_direction = rec.normal;
-    }
-
-    scattered = ray(rec.p, unit_vector(scatter_direction), r_in.time());
+    onb uvw;
+    uvw.build_from_w(rec.normal);
+    auto direction = rec.normal + random_unit_vector();
+    scattered = ray(rec.p, unit_vector(direction), r_in.time());
     alb = albedo->value(rec.u, rec.v, rec.p);
     // cos(theta) / PI
-    pdf = dot(rec.normal, scattered.direction()) / PI;
+    pdf = dot(uvw.w(), scattered.direction()) / PI;
     return true;
   }
 
