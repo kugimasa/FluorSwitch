@@ -13,8 +13,13 @@ class diffuse_light : public material {
     return false;
   }
 
-  virtual color emitted(double u, double v, const point3 &p) const {
-    return emit->value(u, v, p);
+  virtual color emitted(const ray &r_in, const hit_record &rec, double u, double v, const point3 &p) const {
+    // 外側に発光
+    if (rec.front_face) {
+      return emit->value(u, v, p);
+    } else {
+      return BLACK;
+    }
   }
  public:
   shared_ptr<texture> emit;

@@ -24,7 +24,8 @@ class cornell_box : public hittable_list {
     /// 光源
     double x_0 = (box_size - light_size) / 2;
     double x_1 = x_0 + light_size;
-    objects.push_back(make_shared<xz_rect>(x_0, x_1, x_0, x_1, box_size - 1, light_mat));
+    auto diffuse_light = make_shared<flip_face>(make_shared<xz_rect>(x_0, x_1, x_0, x_1, box_size - 1, light_mat));
+    objects.push_back(diffuse_light);
   }
 
 };

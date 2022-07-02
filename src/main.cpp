@@ -27,7 +27,7 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, int
 
   /// レイの反射
   ray scattered;
-  color emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
+  color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
 
   double pdf;
   color albedo;
