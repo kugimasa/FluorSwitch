@@ -138,7 +138,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
         col += ray_color(r, background, world, max_depth);
       }
       progress = double(i + j * nx) / img_size;
+#ifndef NDEBUG
       flush_progress(progress);
+#endif
       drawPix(data, nx, ny, i, j, col, ns);
     }
   }
@@ -150,6 +152,8 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
   std::cout << "Rendered Time: " << elapsed / 1000.0 << "(sec)" << std::endl;
 }
+
+#define CHANNEL_NUM 3
 
 int main() {
   int nx = 600;
@@ -174,7 +178,7 @@ int main() {
   render(output.data, nx, ny, ns);
 
   /// PNG出力
-  if (stbi_write_png("output.png", output.width, output.height, output.ch, output.data, output.width * output.ch)
+  if (stbi_write_png("output.png", nx, ny, CHANNEL_NUM, output.data, nx * CHANNEL_NUM)
       != 1) {
     error_print("Image Save Error");
     return -1;
