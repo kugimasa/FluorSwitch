@@ -31,4 +31,4 @@ add_executable(rtcamp2022
                src/material/material.h
                src/material/light.h)
 
-include_directories("../Utils/stb")
+include_directories("stb")
