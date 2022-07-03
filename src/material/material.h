@@ -6,6 +6,7 @@
 
 #include "../utils/texture.h"
 #include "../utils/onb.h"
+#include "../utils/hittable.h"
 
 ///reflection
 vec3 reflect(const vec3 &v, const vec3 &n) {

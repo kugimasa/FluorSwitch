@@ -3,7 +3,8 @@
 
 #ifndef RAY_CAMERA_CAMERA_H_
 #define RAY_CAMERA_CAMERA_H_
-#include "../utils/ray.h"
+
+#include "../utils/util_funcs.h"
 
 class camera {
  public:

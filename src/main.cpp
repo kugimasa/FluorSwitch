@@ -33,7 +33,7 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, int
   double pdf_val;
   color albedo;
 
-  if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
+  if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val))
     return emitted;
 
   cosine_pdf p(rec.normal);
