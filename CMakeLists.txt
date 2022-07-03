@@ -28,6 +28,7 @@ add_executable(rtcamp2022
                src/objects/constant_medium.h
                src/objects/cornell_box.h
                src/objects/sphere.h
+               src/sampling/pdf.h
                src/material/material.h
                src/material/light.h)
 

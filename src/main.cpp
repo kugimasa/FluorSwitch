@@ -1,16 +1,17 @@
 #include <iostream>
 #include <chrono>
+#include "camera/camera.h"
+#include "material/material.h"
+#include "material/light.h"
 #include "objects/sphere.h"
 #include "objects/aarect.h"
 #include "objects/box.h"
 #include "objects/constant_medium.h"
+#include "objects/cornell_box.h"
+#include "sampling/pdf.h"
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
 #include "utils/my_print.h"
-#include "camera/camera.h"
-#include "material/material.h"
-#include "material/light.h"
-#include "objects/cornell_box.h"
 
 vec3 ray_color(const ray &r, const color &background, const hittable &world, int depth) {
   hit_record rec;
@@ -29,14 +30,19 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, int
   ray scattered;
   color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
 
-  double pdf;
+  double pdf_val;
   color albedo;
 
   if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf))
     return emitted;
+
+  cosine_pdf p(rec.normal);
+  scattered = ray(rec.p, p.generate(), r.time());
+  pdf_val = p.value(scattered.direction());
+
   /// 再起処理
   return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered)
-      * ray_color(scattered, background, world, depth - 1) / pdf;
+      * ray_color(scattered, background, world, depth - 1) / pdf_val;
 }
 
 void flush_progress(double progress) {
