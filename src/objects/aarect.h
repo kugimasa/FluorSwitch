@@ -18,6 +18,24 @@ class xy_rect : public hittable {
     return true;
   }
 
+  double pdf_value(const point3 &o, const vec3 &v) const override {
+    hit_record rec;
+    if (!this->hit(ray(o, v), 0.001, INF, rec)) {
+      return 0;
+    }
+
+    auto area = (x1 - x0) * (y1 - y0);
+    auto distance_squared = rec.t * rec.t * v.squared_length();
+    auto cosine = fabs(dot(v, rec.normal) / v.length());
+
+    return distance_squared / (cosine * area);
+  }
+
+  vec3 random(const vec3 &o) const override {
+    auto random_point = point3(random_double(x0, x1), random_double(y0, y1), k);
+    return random_point - o;
+  }
+
  public:
   shared_ptr<material> mp;
   double x0, x1, y0, y1, k;
@@ -57,6 +75,24 @@ class xz_rect : public hittable {
     return true;
   }
 
+  double pdf_value(const point3 &o, const vec3 &v) const override {
+    hit_record rec;
+    if (!this->hit(ray(o, v), 0.001, INF, rec)) {
+      return 0;
+    }
+
+    auto area = (x1 - x0) * (z1 - z0);
+    auto distance_squared = rec.t * rec.t * v.squared_length();
+    auto cosine = fabs(dot(v, rec.normal) / v.length());
+
+    return distance_squared / (cosine * area);
+  }
+
+  vec3 random(const vec3 &o) const override {
+    auto random_point = point3(random_double(x0, x1), k, random_double(z0, z1));
+    return random_point - o;
+  }
+
  public:
   shared_ptr<material> mp;
   double x0, x1, z0, z1, k;
@@ -94,6 +130,24 @@ class yz_rect : public hittable {
   bool bounding_box(double time0, double time1, aabb &box) const override {
     box = aabb(point3(k - 0.0001, y0, z0), point3(k + 0.0001, y1, z1));
     return true;
+  }
+
+  double pdf_value(const point3 &o, const vec3 &v) const override {
+    hit_record rec;
+    if (!this->hit(ray(o, v), 0.001, INF, rec)) {
+      return 0;
+    }
+
+    auto area = (y1 - y0) * (z1 - z0);
+    auto distance_squared = rec.t * rec.t * v.squared_length();
+    auto cosine = fabs(dot(v, rec.normal) / v.length());
+
+    return distance_squared / (cosine * area);
+  }
+
+  vec3 random(const vec3 &o) const override {
+    auto random_point = point3(k, random_double(y0, y1), random_double(z0, z1));
+    return random_point - o;
   }
 
  public:

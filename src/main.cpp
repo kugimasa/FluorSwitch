@@ -13,7 +13,7 @@
 #include "utils/output_file.h"
 #include "utils/my_print.h"
 
-vec3 ray_color(const ray &r, const color &background, const hittable &world, int depth) {
+vec3 ray_color(const ray &r, const color &background, const hittable &world, shared_ptr<hittable> &lights, int depth) {
   hit_record rec;
 
   /// レイの最大反射後
@@ -28,21 +28,22 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, int
 
   /// レイの反射
   ray scattered;
+  color attenuation;
   color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
-
   double pdf_val;
   color albedo;
 
+  /// 光源にヒットした場合
   if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val))
     return emitted;
 
-  cosine_pdf p(rec.normal);
-  scattered = ray(rec.p, p.generate(), r.time());
-  pdf_val = p.value(scattered.direction());
+  hittable_pdf light_pdf(lights, rec.p);
+  scattered = ray(rec.p, light_pdf.generate(), r.time());
+  pdf_val = light_pdf.value(scattered.direction());
 
   /// 再起処理
   return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered)
-      * ray_color(scattered, background, world, depth - 1) / pdf_val;
+      * ray_color(scattered, background, world, lights, depth - 1) / pdf_val;
 }
 
 void flush_progress(double progress) {
@@ -111,6 +112,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   box2 = make_shared<translate>(box2, vec3(130, 0, 65));
   world.add(box2);
 
+  /// 光源サンプル用
+  shared_ptr<hittable> lights = make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>());
+
   /// 背景
   color background = BLACK;
 
@@ -141,7 +145,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
-        col += ray_color(r, background, world, max_depth);
+        col += ray_color(r, background, world, lights, max_depth);
       }
       progress = double(i + j * nx) / img_size;
 #ifndef NDEBUG
@@ -164,7 +168,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 100;
+  int ns = 10;
 
   /// BitMap
   BITMAPDATA_t output;
@@ -189,7 +193,7 @@ int main() {
     error_print("Image Save Error");
     return -1;
   }
-  
+
   freeBitmapData(&output);
   return 0;
 }

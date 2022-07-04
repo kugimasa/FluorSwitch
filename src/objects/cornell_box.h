@@ -28,6 +28,20 @@ class cornell_box : public hittable_list {
     objects.push_back(diffuse_light);
   }
 
+  /// 光源なし
+  cornell_box(double box_size,
+              shared_ptr<material> right_mat, shared_ptr<material> left_mat,
+              shared_ptr<material> top_mat, shared_ptr<material> bottom_mat,
+              shared_ptr<material> back_mat) {
+
+    /// Cornell壁
+    objects.push_back(make_shared<yz_rect>(0, box_size, 0, box_size, 0, right_mat));
+    objects.push_back(make_shared<yz_rect>(0, box_size, 0, box_size, box_size, left_mat));
+    objects.push_back(make_shared<xz_rect>(0, box_size, 0, box_size, 0, bottom_mat));
+    objects.push_back(make_shared<xz_rect>(0, box_size, 0, box_size, box_size, top_mat));
+    objects.push_back(make_shared<xy_rect>(0, box_size, 0, box_size, box_size, back_mat));
+  }
+
 };
 
 #endif //RTCAMP2022_SRC_OBJECTS_CORNELL_BOX_H_
