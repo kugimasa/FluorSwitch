@@ -37,9 +37,11 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, sha
   if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val))
     return emitted;
 
-  hittable_pdf light_pdf(lights, rec.p);
-  scattered = ray(rec.p, light_pdf.generate(), r.time());
-  pdf_val = light_pdf.value(scattered.direction());
+  auto light_pdf = make_shared<hittable_pdf>(lights, rec.p);
+  auto reflect_pdf = make_shared<cosine_pdf>(rec.normal);
+  mixture_pdf mixture_pdf(light_pdf, reflect_pdf);
+  scattered = ray(rec.p, mixture_pdf.generate(), r.time());
+  pdf_val = mixture_pdf.value(scattered.direction());
 
   /// 再起処理
   return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered)
@@ -113,7 +115,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(box2);
 
   /// 光源サンプル用
-  shared_ptr<hittable> lights = make_shared<xz_rect>(213, 343, 227, 332, 554, shared_ptr<material>());
+  shared_ptr<hittable> lights = make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>());
 
   /// 背景
   color background = BLACK;
@@ -168,7 +170,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 10;
+  int ns = 300;
 
   /// BitMap
   BITMAPDATA_t output;
