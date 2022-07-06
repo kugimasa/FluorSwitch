@@ -13,7 +13,11 @@
 #include "utils/output_file.h"
 #include "utils/my_print.h"
 
-vec3 ray_color(const ray &r, const color &background, const hittable &world, shared_ptr<hittable> &lights, int depth) {
+vec3 ray_color(const ray &r,
+               const color &background,
+               const hittable &world,
+               shared_ptr<hittable> &lights,
+               int depth) {
   hit_record rec;
 
   /// レイの最大反射後
@@ -27,24 +31,29 @@ vec3 ray_color(const ray &r, const color &background, const hittable &world, sha
   }
 
   /// レイの反射
-  ray scattered;
-  color attenuation;
+  scattered_record s_rec;
   color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
-  double pdf_val;
-  color albedo;
 
   /// 光源にヒットした場合
-  if (!rec.mat_ptr->scatter(r, rec, albedo, scattered, pdf_val))
+  if (!rec.mat_ptr->scatter(r, rec, s_rec))
     return emitted;
 
+  /// 鏡面
+  if (s_rec.is_specular) {
+    return s_rec.attenuation * ray_color(s_rec.specular_ray, background, world, lights, depth - 1);
+  }
+
+  /// TODO: 蛍光実装する場合はここで分岐??
+  /// if(s_rec.is_fluor) {}
+
   auto light_pdf = make_shared<hittable_pdf>(lights, rec.p);
-  auto reflect_pdf = make_shared<cosine_pdf>(rec.normal);
-  mixture_pdf mixture_pdf(light_pdf, reflect_pdf);
-  scattered = ray(rec.p, mixture_pdf.generate(), r.time());
-  pdf_val = mixture_pdf.value(scattered.direction());
+  mixture_pdf mixture_pdf(light_pdf, s_rec.pdf_ptr);
+
+  ray scattered = ray(rec.p, mixture_pdf.generate(), r.time());
+  auto pdf_val = mixture_pdf.value(scattered.direction());
 
   /// 再起処理
-  return emitted + albedo * rec.mat_ptr->scattering_pdf(r, rec, scattered)
+  return emitted + s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered)
       * ray_color(scattered, background, world, lights, depth - 1) / pdf_val;
 }
 
@@ -98,24 +107,26 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto white_mat = make_shared<lambertian>(white);
   auto green_mat = make_shared<lambertian>(green);
   auto blue_mat = make_shared<lambertian>(blue);
+  auto aluminum = make_shared<metal>(color(0.8, 0.85, 0.88), 0.0);
+  auto glass = make_shared<dielectric>(1.5);
+
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
 
   cornell_box cb = cornell_box(555, 150, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list>(cb));
 
-  shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), white_mat);
+  shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), aluminum);
   box1 = make_shared<rotate_y>(box1, 15);
   box1 = make_shared<translate>(box1, vec3(265, 0, 295));
   world.add(box1);
 
-  shared_ptr<hittable> box2 = make_shared<box>(point3(0, 0, 0), point3(165, 165, 165), white_mat);
-  box2 = make_shared<rotate_y>(box2, -18);
-  box2 = make_shared<translate>(box2, vec3(130, 0, 65));
-  world.add(box2);
+  world.add(make_shared<sphere>(point3(190, 90, 190), 90, glass));
 
   /// 光源サンプル用
   shared_ptr<hittable> lights = make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>());
+  /// ガラス球サンプル用
+  // shared_ptr<hittable> lights = make_shared<sphere>(point3(190, 90, 190), 90, shared_ptr<material>());
 
   /// 背景
   color background = BLACK;
@@ -170,7 +181,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 300;
+  int ns = 10;
 
   /// BitMap
   BITMAPDATA_t output;
