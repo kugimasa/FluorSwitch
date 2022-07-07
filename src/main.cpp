@@ -124,9 +124,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(make_shared<sphere>(point3(190, 90, 190), 90, glass));
 
   /// 光源サンプル用
-  shared_ptr<hittable> lights = make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>());
+  // shared_ptr<hittable> lights = make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>());
   /// ガラス球サンプル用
-  // shared_ptr<hittable> lights = make_shared<sphere>(point3(190, 90, 190), 90, shared_ptr<material>());
+  shared_ptr<hittable> lights = make_shared<sphere>(point3(190, 90, 190), 90, shared_ptr<material>());
 
   /// 背景
   color background = BLACK;
@@ -181,7 +181,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 10;
+  int ns = 1000;
 
   /// BitMap
   BITMAPDATA_t output;

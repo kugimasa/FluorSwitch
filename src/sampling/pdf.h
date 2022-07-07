@@ -24,6 +24,18 @@ inline vec3 random_cosine_direction() {
   return vec3(x, y, z);
 }
 
+inline vec3 random_to_sphere(double radius, double distance_squared) {
+  auto r1 = random_double();
+  auto r2 = random_double();
+  auto z = 1 + r2 * (sqrt(1 - radius * radius / distance_squared) - 1);
+
+  auto phi = 2 * PI * r1;
+  auto x = cos(phi) * sqrt(1 - z * z);
+  auto y = sin(phi) * sqrt(1 - z * z);
+
+  return vec3(x, y, z);
+}
+
 class cosine_pdf : public pdf {
  public:
   cosine_pdf(const vec3 &w) { uvw.build_from_w(w); }

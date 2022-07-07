@@ -9,10 +9,13 @@
 class sphere : public hittable {
  public:
   sphere();
-  sphere(vec3 cen, double r) : center(cen), radius(r) {};
   sphere(vec3 cen, double r, shared_ptr<material> m) : center(cen), radius(r), mat_ptr(m) {};
-  virtual bool hit(const ray &r, double tmin, double tmax, hit_record &rec) const override;
-  virtual bool bounding_box(double time0, double time1, aabb &box) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool bounding_box(double time0, double time1, aabb &box) const override;
+  double pdf_value(const point3 &o, const vec3 &v) const override;
+  vec3 random(const vec3 &o) const override;
+
+ public:
   vec3 center;
   double radius;
   shared_ptr<material> mat_ptr;
@@ -21,48 +24,67 @@ class sphere : public hittable {
   static void get_sphere_uv(const point3 &p, double &u, double &v) {
     auto theta = acos(-p.y());
     auto phi = atan2(-p.z(), p.x()) + PI;
-    /// 回転あり
-    u = phi / (2 * PI) + 0.1;
+
+    u = phi / (2 * PI);
     v = theta / PI;
   }
 };
 
 bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
   vec3 oc = r.origin() - center;
-  double a = dot(r.direction(), r.direction());
-  double b = dot(oc, r.direction());
-  double c = dot(oc, oc) - radius * radius;
-  double discriminant = b * b - a * c;
-  if (discriminant > 0) {
-    double temp = (-b - sqrt(b * b - a * c)) / a;
-    if (t_min < temp && temp < t_max) {
-      rec.t = temp;
-      rec.p = r.point_at_parameter(rec.t);
-      rec.normal = (rec.p - center) / radius;
-      // TODO: 法線反転
-      get_sphere_uv(rec.normal, rec.u, rec.v);
-      rec.mat_ptr = mat_ptr;
-      return true;
-    }
-    ///another intersecting point
-    temp = (-b + sqrt(b * b - a * c)) / a;
-    if (t_min < temp && temp < t_max) {
-      rec.t = temp;
-      rec.p = r.point_at_parameter(rec.t);
-      // TODO: 法線反転
-      rec.normal = (rec.p - center) / radius;
-      get_sphere_uv(rec.normal, rec.u, rec.v);
-      rec.mat_ptr = mat_ptr;
-      return true;
+  double a = r.direction().squared_length();
+  double half_b = dot(oc, r.direction());
+  double c = oc.squared_length() - radius * radius;
+
+  double discriminant = half_b * half_b - a * c;
+  if (discriminant < 0) {
+    return false;
+  }
+  auto sqrt_d = sqrt(discriminant);
+
+  // 最近傍のrootを探す
+  auto root = (-half_b - sqrt_d) / a;
+  if (root < t_min || t_max < root) {
+    root = (-half_b + sqrt_d) / a;
+    if (root < t_min || t_max < root) {
+      return false;
     }
   }
-  return false;
+
+  rec.t = root;
+  rec.p = r.point_at_parameter(rec.t);
+  vec3 outward_normal = (rec.p - center) / radius;
+  rec.set_face_normal(r, outward_normal);
+  get_sphere_uv(outward_normal, rec.u, rec.v);
+  rec.mat_ptr = mat_ptr;
+
+  return true;
 }
 
 bool sphere::bounding_box(double t0, double t1, aabb &box) const {
   vec3 scale = vec3(radius, radius, radius);
   box = aabb(center - scale, center + scale);
   return true;
+}
+
+vec3 sphere::random(const vec3 &o) const {
+  vec3 direction = center - o;
+  auto distance_squared = direction.squared_length();
+  onb uvw;
+  uvw.build_from_w(direction);
+  return uvw.local(random_to_sphere(radius, distance_squared));
+}
+
+double sphere::pdf_value(const point3 &o, const vec3 &v) const {
+  hit_record rec;
+  if (!this->hit(ray(o, v), 0.001, INF, rec)) {
+    return 0;
+  }
+
+  auto cos_theta_max = sqrt(1 - radius * radius / (center - o).squared_length());
+  auto solid_angle = 2 * PI * (1 - cos_theta_max);
+
+  return 1 / solid_angle;
 }
 
 /// 移動球
