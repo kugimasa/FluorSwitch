@@ -16,7 +16,7 @@
 vec3 ray_color(const ray &r,
                const color &background,
                const hittable &world,
-               shared_ptr<hittable> &lights,
+               shared_ptr<hittable_list> &lights,
                int depth) {
   hit_record rec;
 
@@ -79,6 +79,12 @@ void drawPix(unsigned char *data,
   auto g = pix_color.y();
   auto b = pix_color.z();
 
+  // NaNを除外
+  // NaN同士の比較は成り立たない
+  if (r != r) r = 0.0;
+  if (b != b) b = 0.0;
+  if (g != g) g = 0.0;
+
   // サンプル数の平均 + ガンマ補正(gamma=2.0)
   auto scale = 1.0 / samples_per_pixel;
   r = sqrt(scale * r);
@@ -100,7 +106,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto white = color(.73, .73, .73);
   auto green = color(.12, .45, .15);
   auto blue = color(.05, .05, .65);
-  auto light = color(3, 3, 3);
+  auto light = color(7, 7, 7);
 
   /// マテリアル設定
   auto red_mat = make_shared<lambertian>(red);
@@ -123,10 +129,11 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 
   world.add(make_shared<sphere>(point3(190, 90, 190), 90, glass));
 
+  auto lights = make_shared<hittable_list>();
   /// 光源サンプル用
-  // shared_ptr<hittable> lights = make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>());
+  lights->add(make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>()));
   /// ガラス球サンプル用
-  shared_ptr<hittable> lights = make_shared<sphere>(point3(190, 90, 190), 90, shared_ptr<material>());
+  lights->add(make_shared<sphere>(point3(190, 90, 190), 90, shared_ptr<material>()));
 
   /// 背景
   color background = BLACK;
