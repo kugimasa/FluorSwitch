@@ -32,4 +32,4 @@ add_executable(rtcamp2022
                src/material/material.h
                src/material/light.h)
 
-include_directories("stb")
+include_directories("external/stb")
