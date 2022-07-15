@@ -8,6 +8,7 @@
 #include "objects/box.h"
 #include "objects/constant_medium.h"
 #include "objects/cornell_box.h"
+#include "objects/geometry.h"
 #include "sampling/pdf.h"
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
@@ -128,6 +129,10 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(box1);
 
   world.add(make_shared<sphere>(point3(190, 90, 190), 90, glass));
+
+  // モデルの読み込み
+  // TODO: 交差判定
+  geometry("../assets/obj/kugizarashi.obj");
 
   auto lights = make_shared<hittable_list>();
   /// 光源サンプル用
