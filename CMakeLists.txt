@@ -33,3 +33,4 @@ add_executable(rtcamp2022
                src/material/light.h)
 
 include_directories("external/stb")
+include_directories("external/tinyobjloader")
