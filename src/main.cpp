@@ -158,8 +158,8 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   // 時間計測開始
   start = std::chrono::system_clock::now();
 
-  for (int i = 0; i < nx; i++) {
-    for (int j = 0; j < ny; j++) {
+  for (int j = 0; j < ny; j++) {
+    for (int i = 0; i < nx; i++) {
       vec3 col(0, 0, 0);
       for (int s = 0; s < ns; s++) {
         double u = double(i + drand48()) / double(nx);
