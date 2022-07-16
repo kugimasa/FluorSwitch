@@ -8,7 +8,7 @@
 #include "../utils/util_funcs.h"
 #include "../utils/hittable.h"
 
-class geometry : hittable {
+class geometry : public hittable {
  public:
   geometry();
   geometry(const char *file_path);
@@ -53,16 +53,23 @@ bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
       for (size_t v = 0; v < fv; v++) {
         // 頂点取得
         tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-        tinyobj::real_t vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
-        tinyobj::real_t vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
-        tinyobj::real_t vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
+        auto vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
+        auto vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
+        auto vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
 
         // 法線判定
         if (idx.normal_index >= 0) {
-          tinyobj::real_t nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
-          tinyobj::real_t ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
-          tinyobj::real_t nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
+          auto nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
+          auto ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
+          auto nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
         }
+
+        // テクスチャ座標
+        if (idx.texcoord_index >= 0) {
+          auto tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
+          auto ty = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
+        }
+
       }
       index_offset += fv;
     }
@@ -70,7 +77,7 @@ bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
   return false;
 }
 bool geometry::bounding_box(double t0, double t1, aabb &box) const {
-  return false;
+  return true;
 }
 vec3 geometry::random(const vec3 &o) const {
   return hittable::random(o);

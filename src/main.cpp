@@ -9,6 +9,7 @@
 #include "objects/constant_medium.h"
 #include "objects/cornell_box.h"
 #include "objects/geometry.h"
+#include "objects/triangle.h"
 #include "sampling/pdf.h"
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
@@ -132,7 +133,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 
   // モデルの読み込み
   // TODO: 交差判定
-  geometry("../assets/obj/kugizarashi.obj");
+  // geometry("../assets/obj/kugizarashi.obj");
+  // 三角形テスト
+  world.add(make_shared<triangle>(point3(0, 0, 555), point3(0, 0, 0), point3(0, 555, 0), green_mat));
 
   auto lights = make_shared<hittable_list>();
   /// 光源サンプル用
@@ -193,7 +196,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 1000;
+  int ns = 256;
 
   /// BitMap
   BITMAPDATA_t output;
