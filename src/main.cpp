@@ -54,9 +54,10 @@ vec3 ray_color(const ray &r,
   ray scattered = ray(rec.p, mixture_pdf.generate(), r.time());
   auto pdf_val = mixture_pdf.value(scattered.direction());
 
+  auto ray_c = ray_color(scattered, background, world, lights, depth - 1);
+
   /// 再起処理
-  return emitted + s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered)
-      * ray_color(scattered, background, world, lights, depth - 1) / pdf_val;
+  return emitted + s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c / pdf_val;
 }
 
 void flush_progress(double progress) {
@@ -115,8 +116,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto white_mat = make_shared<lambertian>(white);
   auto green_mat = make_shared<lambertian>(green);
   auto blue_mat = make_shared<lambertian>(blue);
-  auto aluminum = make_shared<metal>(color(0.8, 0.85, 0.88), 0.0);
-  auto glass = make_shared<dielectric>(1.5);
+  auto kugi_mat = make_shared<lambertian>(CYAN);
 
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
@@ -124,24 +124,14 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   cornell_box cb = cornell_box(555, 150, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list>(cb));
 
-  shared_ptr<hittable> box1 = make_shared<box>(point3(0, 0, 0), point3(165, 330, 165), aluminum);
-  box1 = make_shared<rotate_y>(box1, 15);
-  box1 = make_shared<translate>(box1, vec3(265, 0, 295));
-  world.add(box1);
-
-  world.add(make_shared<sphere>(point3(190, 90, 190), 90, glass));
-
-  // モデルの読み込み
-  // TODO: 交差判定
-  // geometry("../assets/obj/kugizarashi.obj");
-  // 三角形テスト
-  world.add(make_shared<triangle>(point3(0, 0, 555), point3(0, 0, 0), point3(0, 555, 0), green_mat));
+  // OBJモデルの読み込み
+  shared_ptr<hittable> kugizarashi = make_shared<geometry>("../assets/obj/kugizarashi.obj", kugi_mat);
+  kugizarashi = make_shared<translate>(kugizarashi, vec3(265, 0, 265));
+  world.add(kugizarashi);
 
   auto lights = make_shared<hittable_list>();
   /// 光源サンプル用
   lights->add(make_shared<xz_rect>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>()));
-  /// ガラス球サンプル用
-  lights->add(make_shared<sphere>(point3(190, 90, 190), 90, shared_ptr<material>()));
 
   /// 背景
   color background = BLACK;
@@ -196,7 +186,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 256;
+  int ns = 1;
 
   /// BitMap
   BITMAPDATA_t output;

@@ -7,11 +7,12 @@
 #include "../../external/tinyobjloader/tiny_obj_loader.h"
 #include "../utils/util_funcs.h"
 #include "../utils/hittable.h"
+#include "triangle.h"
 
 class geometry : public hittable {
  public:
   geometry();
-  geometry(const char *file_path);
+  geometry(const char *file_path, shared_ptr<material> m);
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
@@ -21,12 +22,14 @@ class geometry : public hittable {
  public:
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
+  std::vector<shared_ptr<triangle>> tris;
   shared_ptr<material> mat_ptr;
 };
 
-geometry::geometry(const char *file_path) {
+geometry::geometry(const char *file_path, shared_ptr<material> m) {
   tinyobj::ObjReaderConfig reader_config;
   tinyobj::ObjReader reader;
+  reader_config.mtl_search_path = "../../assets/obj/";
   if (!reader.ParseFromFile(file_path, reader_config)) {
     if (!reader.Error().empty()) {
       std::cerr << "TinyObjReader: " << reader.Error();
@@ -40,9 +43,9 @@ geometry::geometry(const char *file_path) {
 
   shapes = reader.GetShapes();
   attrib = reader.GetAttrib();
-}
 
-bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+  // 頂点の登録
+  std::vector<vertex> vertices;
   for (size_t s = 0; s < shapes.size(); s++) {
     // ポリゴンでループ
     size_t index_offset = 0;
@@ -56,22 +59,49 @@ bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
         auto vx = attrib.vertices[3 * size_t(idx.vertex_index) + 0];
         auto vy = attrib.vertices[3 * size_t(idx.vertex_index) + 1];
         auto vz = attrib.vertices[3 * size_t(idx.vertex_index) + 2];
+        auto nx = 0;
+        auto ny = 0;
+        auto nz = 1;
+        auto tx = 0;
+        auto ty = 0;
+
 
         // 法線判定
         if (idx.normal_index >= 0) {
-          auto nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
-          auto ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
-          auto nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
+          nx = attrib.normals[3 * size_t(idx.normal_index) + 0];
+          ny = attrib.normals[3 * size_t(idx.normal_index) + 1];
+          nz = attrib.normals[3 * size_t(idx.normal_index) + 2];
         }
 
         // テクスチャ座標
         if (idx.texcoord_index >= 0) {
-          auto tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
-          auto ty = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
+          tx = attrib.texcoords[2 * size_t(idx.texcoord_index) + 0];
+          ty = attrib.texcoords[2 * size_t(idx.texcoord_index) + 1];
         }
 
+        vertex vert;
+        vert.p = vec3(vx, vy, vz);
+        vert.n = vec3(nx, ny, nz);
+        vert.u = tx;
+        vert.v = ty;
+        vertices.push_back(vert);
       }
       index_offset += fv;
+    }
+  }
+
+  for (int i = 0; i < vertices.size() / 3; ++i) {
+    tris.push_back(make_shared<triangle>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
+  }
+
+  shapes.clear();
+}
+
+bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+  long triangles_size = tris.size();
+  for (long i = 0; i < triangles_size; ++i) {
+    if (tris[i]->hit(r, t_min, t_max, rec)) {
+      return true;
     }
   }
   return false;
