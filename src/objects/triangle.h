@@ -90,7 +90,7 @@ bool triangle::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
     return false;
   }
   double t = dot(e2, q_vec) * inv_det;
-  if (t_min < t && t < t_max) {
+  if (t < t_min || t_max < t) {
     return false;
   }
   rec.t = t;
