@@ -36,3 +36,5 @@ add_executable(rtcamp2022
 
 include_directories("external/stb")
 include_directories("external/tinyobjloader")
+
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})

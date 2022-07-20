@@ -29,7 +29,7 @@ class geometry : public hittable {
 geometry::geometry(const char *file_path, shared_ptr<material> m) {
   tinyobj::ObjReaderConfig reader_config;
   tinyobj::ObjReader reader;
-  reader_config.mtl_search_path = "../../assets/obj/";
+  reader_config.mtl_search_path = "./assets/obj/";
   if (!reader.ParseFromFile(file_path, reader_config)) {
     if (!reader.Error().empty()) {
       std::cerr << "TinyObjReader: " << reader.Error();

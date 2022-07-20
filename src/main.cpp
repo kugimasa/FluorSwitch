@@ -125,7 +125,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(make_shared<hittable_list>(cb));
 
   // OBJモデルの読み込み
-  shared_ptr<hittable> kugizarashi = make_shared<geometry>("../assets/obj/kugizarashi.obj", kugi_mat);
+  shared_ptr<hittable> kugizarashi = make_shared<geometry>("./assets/obj/kugizarashi.obj", kugi_mat);
   kugizarashi = make_shared<translate>(kugizarashi, vec3(265, 0, 265));
   world.add(kugizarashi);
 
