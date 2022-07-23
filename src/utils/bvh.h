@@ -1,6 +1,7 @@
 #ifndef RTCAMP2022_SRC_UTILS_BVH_H_
 #define RTCAMP2022_SRC_UTILS_BVH_H_
 
+#include <algorithm>
 #include "hittable.h"
 #include "hittable_list.h"
 #include "../objects/geometry.h"
