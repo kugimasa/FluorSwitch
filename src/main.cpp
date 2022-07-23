@@ -14,6 +14,7 @@
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
 #include "utils/my_print.h"
+#include "utils/bvh.h"
 
 vec3 ray_color(const ray &r,
                const color &background,
@@ -125,9 +126,10 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(make_shared<hittable_list>(cb));
 
   // OBJモデルの読み込み
-  shared_ptr<hittable> kugizarashi = make_shared<geometry>("./assets/obj/kugizarashi.obj", kugi_mat);
-  kugizarashi = make_shared<translate>(kugizarashi, vec3(265, 0, 265));
-  world.add(kugizarashi);
+  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", kugi_mat);
+
+  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 0, 265));
+  world.add(obj_bvh);
 
   auto lights = make_shared<hittable_list>();
   /// 光源サンプル用

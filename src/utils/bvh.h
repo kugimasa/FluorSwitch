@@ -3,14 +3,15 @@
 
 #include "hittable.h"
 #include "hittable_list.h"
+#include "../objects/geometry.h"
 
 class bvh_node : public hittable {
  public:
   bvh_node() {}
-  bvh_node(const hittable_list &list, double t0, double t1)
-      : bvh_node(list.objects, 0, list.objects.size(), t0, t1) {}
+  bvh_node(const shared_ptr<geometry> &obj, double t0, double t1)
+      : bvh_node(obj->tris, 0, obj->tris.size(), t0, t1) {}
 
-  bvh_node(const std::vector<shared_ptr<hittable>> &src_objects, size_t start, size_t end, double t0, double t1);
+  bvh_node(const std::vector<shared_ptr<triangle>> &tris, size_t start, size_t end, double t0, double t1);
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
@@ -41,13 +42,13 @@ bool box_z_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
   return box_compare(a, b, 2);
 }
 
-bvh_node::bvh_node(const std::vector<shared_ptr<hittable>> &src_objects,
+bvh_node::bvh_node(const std::vector<shared_ptr<triangle>> &tris,
                    size_t start,
                    size_t end,
                    double t0,
                    double t1) {
 
-  auto objects = src_objects;
+  auto objects = tris;
   // チェックする軸をX,Y,Zからランダムで選択
   int axis = int(3 * drand48());
   auto comparator = (axis == 0) ? box_x_compare
@@ -87,8 +88,8 @@ bvh_node::bvh_node(const std::vector<shared_ptr<hittable>> &src_objects,
   box = surrounding_box(box_left, box_right);
 }
 
-bool bvh_node::bounding_box(double t0, double t1, aabb &box) const {
-  box = box;
+bool bvh_node::bounding_box(double t0, double t1, aabb &output_box) const {
+  output_box = box;
   return true;
 }
 

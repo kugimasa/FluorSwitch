@@ -24,10 +24,8 @@ class aabb {
   bool hit(const ray &r, double tmin, double tmax) const {
     for (int i = 0; i < 3; i++) {
       double invD = 1.0 / r.direction()[i];
-      double a = (min()[i] - r.origin()[i]) * invD;
-      double b = (max()[i] - r.origin()[i]) * invD;
-      double t0 = ffmin(a, b);
-      double t1 = ffmax(a, b);
+      double t0 = (min()[i] - r.origin()[i]) * invD;
+      double t1 = (max()[i] - r.origin()[i]) * invD;
       // 反転
       if (invD < 0.0) std::swap(t0, t1);
       tmin = ffmax(t0, tmin);

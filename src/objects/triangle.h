@@ -51,8 +51,11 @@ class triangle : public hittable {
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double time0, double time1, aabb &box) const override {
-    vec3 a = vert[0] - 0.0001 * face_norm;
-    vec3 b = (vert[0] + e1 + e2) + 0.0001 * face_norm;
+    vec3 a, b;
+    for (int i = 0; i < 3; ++i) {
+      a[i] = std::min(std::min(vert[0][i], vert[1][i]), vert[2][i]);
+      b[i] = std::max(std::max(vert[0][i], vert[1][i]), vert[2][i]);
+    }
     box = aabb(a, b);
     return true;
   }
