@@ -12,21 +12,42 @@
 class geometry : public hittable {
  public:
   geometry();
+  geometry(const char *file_path);
   geometry(const char *file_path, shared_ptr<material> m);
 
   bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
   vec3 random(const vec3 &o) const override;
   double pdf_value(const point3 &o, const vec3 &v) const override;
+ private:
+  void load_obj(const char *file_path, std::vector<vertex> &vertices);
 
  public:
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> materials;
   std::vector<shared_ptr<triangle>> tris;
-  shared_ptr<material> mat_ptr;
 };
 
+// TODO blenderマテリアルを取得
+geometry::geometry(const char *file_path) {
+  std::vector<vertex> vertices;
+  load_obj(file_path, vertices);
+  for (int i = 0; i < vertices.size() / 3; ++i) {
+    shared_ptr<material> m = make_shared<lambertian>(CYAN);
+    tris.push_back(make_shared<triangle>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
+  }
+}
+
 geometry::geometry(const char *file_path, shared_ptr<material> m) {
+  std::vector<vertex> vertices;
+  load_obj(file_path, vertices);
+  for (int i = 0; i < vertices.size() / 3; ++i) {
+    tris.push_back(make_shared<triangle>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
+  }
+}
+
+void geometry::load_obj(const char *file_path, std::vector<vertex> &vertices) {
   tinyobj::ObjReaderConfig reader_config;
   tinyobj::ObjReader reader;
   reader_config.mtl_search_path = "./assets/obj/";
@@ -41,11 +62,11 @@ geometry::geometry(const char *file_path, shared_ptr<material> m) {
     std::cout << "TinyObjReader: " << reader.Warning();
   }
 
-  shapes = reader.GetShapes();
   attrib = reader.GetAttrib();
+  shapes = reader.GetShapes();
+  materials = reader.GetMaterials();
 
   // 頂点の登録
-  std::vector<vertex> vertices;
   for (size_t s = 0; s < shapes.size(); s++) {
     // ポリゴンでループ
     size_t index_offset = 0;
@@ -64,7 +85,6 @@ geometry::geometry(const char *file_path, shared_ptr<material> m) {
         auto nz = 1;
         auto tx = 0;
         auto ty = 0;
-
 
         // 法線判定
         if (idx.normal_index >= 0) {
@@ -89,11 +109,6 @@ geometry::geometry(const char *file_path, shared_ptr<material> m) {
       index_offset += fv;
     }
   }
-
-  for (int i = 0; i < vertices.size() / 3; ++i) {
-    tris.push_back(make_shared<triangle>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
-  }
-
   shapes.clear();
 }
 

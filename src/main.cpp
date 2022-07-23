@@ -117,7 +117,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto white_mat = make_shared<lambertian>(white);
   auto green_mat = make_shared<lambertian>(green);
   auto blue_mat = make_shared<lambertian>(blue);
-  auto kugi_mat = make_shared<lambertian>(CYAN);
+  auto glass = make_shared<dielectric>(1.5);
 
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
@@ -126,9 +126,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   world.add(make_shared<hittable_list>(cb));
 
   // OBJモデルの読み込み
-  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", kugi_mat);
+  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", glass);
 
-  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 0, 265));
+  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 50, 265));
   world.add(obj_bvh);
 
   auto lights = make_shared<hittable_list>();
@@ -188,7 +188,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 int main() {
   int nx = 600;
   int ny = 600;
-  int ns = 1;
+  int ns = 256;
 
   /// BitMap
   BITMAPDATA_t output;
