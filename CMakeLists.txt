@@ -37,4 +37,8 @@ add_executable(rtcamp2022
 include_directories("external/stb")
 include_directories("external/tinyobjloader")
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(rtcamp2022 PUBLIC "-pthread")
+
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
