@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <thread>
 #include "camera/camera.h"
 #include "material/material.h"
 #include "material/light.h"
@@ -103,6 +104,8 @@ void drawPix(unsigned char *data,
 }
 
 void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
+  std::cout << "PPS: " << ns << std::endl;
+  std::cout << "========== Render ==========" << std::endl;
   /// シーンデータ
   hittable_list world;
 
@@ -125,11 +128,12 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   cornell_box cb = cornell_box(555, 150, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list>(cb));
 
-  // OBJモデルの読み込み
-  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", glass);
-
-  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 50, 265));
-  world.add(obj_bvh);
+//  std::cout << "+++++++++ Load Obj +++++++++" << std::endl;
+//  // OBJモデルの読み込み
+//  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", glass);
+//  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 50, 265));
+//  world.add(obj_bvh);
+//  std::cout << "++++++++++ Finish ++++++++++" << std::endl;
 
   auto lights = make_shared<hittable_list>();
   /// 光源サンプル用
@@ -150,8 +154,6 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
   double progress{0.0};
   int img_size = nx * ny;
-  std::cout << "PPS: " << ns << std::endl;
-  std::cout << "========== Render ==========" << std::endl;
 
   // chrono変数
   std::chrono::system_clock::time_point start, end;
@@ -185,10 +187,11 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 
 #define CHANNEL_NUM 3
 
-int main() {
+// メインの処理
+void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 256;
+  int ns = 100;
 
   /// BitMap
   BITMAPDATA_t output;
@@ -199,7 +202,7 @@ int main() {
   output.data = (unsigned char *) malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
   if (output.data == NULL) {
     error_print("Memory Allocation Error");
-    return -1;
+    exit(-1);
   }
 
   /// 背景色の指定
@@ -208,12 +211,20 @@ int main() {
   render(output.data, nx, ny, ns);
 
   /// PNG出力
-  if (stbi_write_png("output.png", nx, ny, CHANNEL_NUM, output.data, nx * CHANNEL_NUM)
-      != 1) {
+  if (stbi_write_png("output.png", nx, ny, CHANNEL_NUM, output.data, nx * CHANNEL_NUM) != 1) {
     error_print("Image Save Error");
-    return -1;
+    exit(-1);
   }
 
   freeBitmapData(&output);
+  exit(0);
+}
+
+int main() {
+  // 実行開始
+  std::thread timer(program_timer);
+  std::thread exec(execute);
+  timer.join();
+  exec.join();
   return 0;
 }
