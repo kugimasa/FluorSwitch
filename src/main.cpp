@@ -103,9 +103,9 @@ void drawPix(unsigned char *data,
   p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
 }
 
-void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
-  std::cout << "PPS: " << ns << std::endl;
-  std::cout << "========== Render ==========" << std::endl;
+// 30fps * 5 sec
+#define MAX_FRAME 150
+void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int frame = 1) {
   /// シーンデータ
   hittable_list world;
 
@@ -120,7 +120,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   auto white_mat = make_shared<lambertian>(white);
   auto green_mat = make_shared<lambertian>(green);
   auto blue_mat = make_shared<lambertian>(blue);
-  auto glass = make_shared<dielectric>(1.5);
+  auto kugi_mat = make_shared<lambertian>(KUGI_COLOR);
 
   /// 光源設定
   auto light_mat = make_shared<diffuse_light>(light);
@@ -134,6 +134,12 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 //  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 50, 265));
 //  world.add(obj_bvh);
 //  std::cout << "++++++++++ Finish ++++++++++" << std::endl;
+
+  /// 拡大縮小/移動する球
+  double f = (double) frame / (MAX_FRAME * 2);
+  double offset = 50;
+  double radius = 90 + sin(f * 2 * PI) * offset;
+  world.add(make_shared<sphere>(vec3(radius + 100, 90, radius + 100), radius, kugi_mat));
 
   auto lights = make_shared<hittable_list>();
   /// 光源サンプル用
@@ -155,11 +161,6 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
   double progress{0.0};
   int img_size = nx * ny;
 
-  // chrono変数
-  std::chrono::system_clock::time_point start, end;
-  // 時間計測開始
-  start = std::chrono::system_clock::now();
-
   for (int j = 0; j < ny; j++) {
     for (int i = 0; i < nx; i++) {
       vec3 col(0, 0, 0);
@@ -176,13 +177,6 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
       drawPix(data, nx, ny, i, j, col, ns);
     }
   }
-
-  // 時間計測終了
-  end = std::chrono::system_clock::now();
-  std::cout << "\n========== Finish ==========" << std::endl;
-  // 経過時間の算出
-  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-  std::cout << "Rendered Time: " << elapsed / 1000.0 << "(sec)" << std::endl;
 }
 
 #define CHANNEL_NUM 3
@@ -191,32 +185,51 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns) {
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 100;
+  int ns = 1;
+  std::cout << "PPS: " << ns << std::endl;
+  std::cout << "========== Render ==========" << std::endl;
 
   /// BitMap
   BITMAPDATA_t output;
   output.width = nx;
   output.height = ny;
   output.ch = 3;
-  /// Malloc
-  output.data = (unsigned char *) malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
-  if (output.data == NULL) {
-    error_print("Memory Allocation Error");
-    exit(-1);
+
+  // chrono変数
+  std::chrono::system_clock::time_point start, end;
+
+  for (int frame = 1; frame <= MAX_FRAME; ++frame) {
+    // 時間計測開始
+    start = std::chrono::system_clock::now();
+    /// Malloc
+    output.data = (unsigned char *) malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
+    if (output.data == NULL) {
+      error_print("Memory Allocation Error");
+      exit(-1);
+    }
+
+    /// 背景色の指定
+    memset(output.data, 0xFF, output.width * output.height * output.ch);
+    /// 描画処理
+    render(output.data, nx, ny, ns, frame);
+
+    /// PNG出力
+    std::ostringstream sout;
+    sout << std::setw(3) << std::setfill('0') << frame;
+    std::string output_file = sout.str() + ".png";
+    if (stbi_write_png(output_file.c_str(), nx, ny, CHANNEL_NUM, output.data, nx * CHANNEL_NUM) != 1) {
+      error_print("Image Save Error");
+      exit(-1);
+    }
+
+    freeBitmapData(&output);
+    // 時間計測終了
+    end = std::chrono::system_clock::now();
+    // 経過時間の算出
+    double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "\n[" << sout.str() << "]: " << elapsed / 1000.0 << "(sec)s" << std::endl;
   }
-
-  /// 背景色の指定
-  memset(output.data, 0xFF, output.width * output.height * output.ch);
-  /// 描画処理
-  render(output.data, nx, ny, ns);
-
-  /// PNG出力
-  if (stbi_write_png("output.png", nx, ny, CHANNEL_NUM, output.data, nx * CHANNEL_NUM) != 1) {
-    error_print("Image Save Error");
-    exit(-1);
-  }
-
-  freeBitmapData(&output);
+  std::cout << "\n========== Finish ==========" << std::endl;
   exit(0);
 }
 
