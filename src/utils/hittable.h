@@ -97,9 +97,9 @@ rotate_y::rotate_y(shared_ptr<hittable> p, double angle) : ptr(p) {
   point3 min(INF, INF, INF);
   point3 max(-INF, -INF, -INF);
 
-  for (int i = 0; i < 2; i++) {
-    for (int j = 0; j < 2; j++) {
-      for (int k = 0; k < 2; k++) {
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 2; ++j) {
+      for (int k = 0; k < 2; ++k) {
         auto x = i * bbox.max().x() + (1 - i) * bbox.min().x();
         auto y = j * bbox.max().y() + (1 - j) * bbox.min().y();
         auto z = k * bbox.max().z() + (1 - k) * bbox.min().z();
@@ -109,7 +109,7 @@ rotate_y::rotate_y(shared_ptr<hittable> p, double angle) : ptr(p) {
 
         vec3 tester(newx, y, newz);
 
-        for (int c = 0; c < 3; c++) {
+        for (int c = 0; c < 3; ++c) {
           min[c] = fmin(min[c], tester[c]);
           max[c] = fmax(max[c], tester[c]);
         }

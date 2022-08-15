@@ -18,9 +18,9 @@ class camera {
   }
   /// Defocus Blur
   camera(vec3 lookfrom, vec3 lookat, vec3 vup, double vfov, double aspect, double aperture, double focus_dist) {
-    lens_radius = aperture / 2;
-    double theta = vfov * M_PI / 180;
-    double half_height = tan(theta / 2);
+    lens_radius = aperture * 0.5;
+    double theta = degrees_to_radians(vfov);
+    double half_height = tan(theta * 0.5);
     double half_width = aspect * half_height;
     origin = lookfrom;
     w = unit_vector(lookfrom - lookat);
@@ -31,8 +31,8 @@ class camera {
     vertical = 2 * half_height * focus_dist * v;
   }
   camera(vec3 lookfrom, vec3 lookat, vec3 vup, double vfov, double aspect) {
-    double theta = vfov * M_PI / 180;
-    double half_height = tan(theta / 2);
+    double theta = degrees_to_radians(vfov);
+    double half_height = tan(theta * 0.5);
     double half_width = aspect * half_height;
     origin = lookfrom;
     w = unit_vector(lookfrom - lookat);

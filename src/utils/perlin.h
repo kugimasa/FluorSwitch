@@ -31,9 +31,9 @@ class perlin {
     auto k = static_cast<int>(floor(p.z()));
     vec3 c[2][2][2];
 
-    for (int di = 0; di < 2; di++) {
-      for (int dj = 0; dj < 2; dj++) {
-        for (int dk = 0; dk < 2; dk++) {
+    for (int di = 0; di < 2; ++di) {
+      for (int dj = 0; dj < 2; ++dj) {
+        for (int dk = 0; dk < 2; ++dk) {
           c[di][dj][dk] = ranvec[
               perm_x[(i + di) & 255] ^
                   perm_y[(j + dj) & 255] ^
@@ -69,9 +69,9 @@ class perlin {
     w = w * w * (3 - 2 * w);
     auto accum = 0.0;
 
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 2; j++) {
-        for (int k = 0; k < 2; k++) {
+    for (int i = 0; i < 2; ++i) {
+      for (int j = 0; j < 2; ++j) {
+        for (int k = 0; k < 2; ++k) {
           // 長さ[0,1]のベクトル
           vec3 wegiht_v(u - i, v - j, w - k);
           accum += (i * u + (1 - i) * (1 - u))

@@ -23,10 +23,10 @@ class sphere : public hittable {
  private:
   static void get_sphere_uv(const point3 &p, double &u, double &v) {
     auto theta = acos(-p.y());
-    auto phi = atan2(-p.z(), p.x()) + PI;
+    auto phi = atan2(-p.z(), p.x()) + M_PI;
 
-    u = phi / (2 * PI);
-    v = theta / PI;
+    u = phi * M_1_PI * 0.5;
+    v = theta * M_1_PI;
   }
 };
 
@@ -82,7 +82,7 @@ double sphere::pdf_value(const point3 &o, const vec3 &v) const {
   }
 
   auto cos_theta_max = sqrt(1 - radius * radius / (center - o).squared_length());
-  auto solid_angle = 2 * PI * (1 - cos_theta_max);
+  auto solid_angle = 2 * M_PI * (1 - cos_theta_max);
 
   return 1 / solid_angle;
 }

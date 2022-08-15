@@ -22,7 +22,7 @@ class aabb {
 
   // 交差判定
   bool hit(const ray &r, double tmin, double tmax) const {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; ++i) {
       double invD = 1.0 / r.direction()[i];
       double t0 = (min()[i] - r.origin()[i]) * invD;
       double t1 = (max()[i] - r.origin()[i]) * invD;

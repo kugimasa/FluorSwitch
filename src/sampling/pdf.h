@@ -17,7 +17,7 @@ inline vec3 random_cosine_direction() {
   auto r2 = random_double();
   auto z = sqrt(1 - r2);
 
-  auto phi = 2 * PI * r1;
+  auto phi = 2 * M_PI * r1;
   auto x = cos(phi) * sqrt(r2);
   auto y = sin(phi) * sqrt(r2);
 
@@ -29,7 +29,7 @@ inline vec3 random_to_sphere(double radius, double distance_squared) {
   auto r2 = random_double();
   auto z = 1 + r2 * (sqrt(1 - radius * radius / distance_squared) - 1);
 
-  auto phi = 2 * PI * r1;
+  auto phi = 2 * M_PI * r1;
   auto x = cos(phi) * sqrt(1 - z * z);
   auto y = sin(phi) * sqrt(1 - z * z);
 
@@ -42,7 +42,7 @@ class cosine_pdf : public pdf {
 
   double value(const vec3 &direction) const override {
     auto cosine = dot(unit_vector(direction), uvw.w());
-    return (cosine <= 0) ? 0 : cosine / PI;
+    return (cosine <= 0) ? 0 : cosine * M_1_PI;
   }
 
   vec3 generate() const override {

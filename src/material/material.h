@@ -66,7 +66,7 @@ class lambertian : public material {
 
   double scattering_pdf(const ray &r_in, const hit_record &rec, const ray &scattered) const {
     auto cos = dot(rec.normal, unit_vector(scattered.direction()));
-    return cos < 0 ? 0 : cos / PI;
+    return cos < 0 ? 0 : cos * M_1_PI;
   }
 
   shared_ptr<texture> albedo;
@@ -136,7 +136,7 @@ class isotropic : public material {
     s_rec.pdf_ptr = nullptr;
     return true;
   }
-  
+
  public:
   shared_ptr<texture> albedo;
 };

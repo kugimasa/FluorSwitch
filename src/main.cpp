@@ -105,7 +105,7 @@ void drawPix(unsigned char *data,
 }
 
 // 30fps * 5 sec
-#define MAX_FRAME 150
+#define MAX_FRAME 10
 void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int frame = 1) {
   /// シーンデータ
   hittable_list world;
@@ -139,7 +139,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
   /// 拡大縮小/移動する球
   double f = (double) frame / (MAX_FRAME * 2);
   double offset = 50;
-  double radius = 90 + sin(f * 2 * PI) * offset;
+  double radius = 90 + sin(f * 2 * M_PI) * offset;
   world.add(make_shared<sphere>(vec3(radius + 100, 90, radius + 100), radius, kugi_mat));
 
   auto lights = make_shared<hittable_list>();
@@ -162,10 +162,10 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
   double progress{0.0};
   int img_size = nx * ny;
 
-  for (int j = 0; j < ny; j++) {
-    for (int i = 0; i < nx; i++) {
+  for (int j = 0; j < ny; ++j) {
+    for (int i = 0; i < nx; ++i) {
       vec3 col(0, 0, 0);
-      for (int s = 0; s < ns; s++) {
+      for (int s = 0; s < ns; ++s) {
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
@@ -186,7 +186,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 25;
+  int ns = 1;
   std::cout << "PPS: " << ns << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
@@ -196,12 +196,16 @@ void execute() {
   output.height = ny;
   output.ch = 3;
 
+#ifndef NDEBUG
   // chrono変数
   std::chrono::system_clock::time_point start, end;
+#endif
 
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {
+#ifndef NDEBUG
     // 時間計測開始
     start = std::chrono::system_clock::now();
+#endif
     /// Malloc
     output.data = (unsigned char *) malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
     if (output.data == NULL) {
@@ -224,11 +228,13 @@ void execute() {
     }
 
     freeBitmapData(&output);
+#ifndef NDEBUG
     // 時間計測終了
     end = std::chrono::system_clock::now();
     // 経過時間の算出
     double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "\n[" << sout.str() << "]: " << elapsed / 1000.0 << "(sec)s" << std::endl;
+    std::cout << "\n[" << sout.str() << "]: " << elapsed * 0.001 << "(sec)s" << std::endl;
+#endif
   }
   std::cout << "\n========== Finish ==========" << std::endl;
   exit(0);
