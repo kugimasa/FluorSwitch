@@ -22,19 +22,13 @@ jobs:
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.1.0
-      with:
-        name: ubuntu_build
-        path: ${{github.workspace}}/build/rtcamp2022
         
     - name: Render
       run: ${{github.workspace}}/build/rtcamp2022
       
-    - name: Upload Rendered Image
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v3.1.0
       with:
-        name: output.png
-        path: ${{github.workspace}}/output.png
+        name: ubuntu_build
+        path: ${{github.workspace}}/
       
