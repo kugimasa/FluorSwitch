@@ -22,6 +22,12 @@ jobs:
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      
+    - name: Check G++
+      run: g++ --version
+      
+    - name: Check C++
+      run: c++ --version
         
     - name: Render
       run: ${{github.workspace}}/build/rtcamp2022
