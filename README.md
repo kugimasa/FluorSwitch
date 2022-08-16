@@ -11,3 +11,5 @@ Thank you [@Peter_shirley](https://twitter.com/Peter_shirley) !!
 ## Requirements
 
 - [stb](https://github.com/nothings/stb)
+- [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader)
+- [fast-cpp-csv-parser](https://github.com/ben-strasser/fast-cpp-csv-parser)
