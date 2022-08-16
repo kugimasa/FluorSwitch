@@ -17,7 +17,6 @@
 #include "utils/output_file.h"
 #include "utils/my_print.h"
 #include "utils/bvh.h"
-#include "utils/spectral_distribution.h"
 #include "render/path_trace.h"
 
 void drawPix(unsigned char *data,
