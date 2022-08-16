@@ -36,6 +36,7 @@ add_executable(rtcamp2022
 
 include_directories("external/stb")
 include_directories("external/tinyobjloader")
+include_directories("external/fast-cpp-csv-parser")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
