@@ -32,7 +32,8 @@ add_executable(rtcamp2022
                src/objects/triangle.h
                src/sampling/pdf.h
                src/material/material.h
-               src/material/light.h)
+               src/material/light.h
+               src/render/path_trace.h)
 
 include_directories("external/stb")
 include_directories("external/tinyobjloader")

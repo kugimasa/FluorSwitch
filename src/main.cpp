@@ -17,63 +17,7 @@
 #include "utils/output_file.h"
 #include "utils/my_print.h"
 #include "utils/bvh.h"
-
-vec3 ray_color(const ray &r,
-               const color &background,
-               const hittable &world,
-               shared_ptr<hittable_list> &lights,
-               int depth) {
-  hit_record rec;
-
-  /// レイの最大反射後
-  if (depth <= 0) {
-    return BLACK;
-  }
-
-  /// 背景色
-  if (!world.hit(r, 0.001, INF, rec)) {
-    return background;
-  }
-
-  /// レイの反射
-  scattered_record s_rec;
-  color emitted = rec.mat_ptr->emitted(r, rec, rec.u, rec.v, rec.p);
-
-  /// 光源にヒットした場合
-  if (!rec.mat_ptr->scatter(r, rec, s_rec))
-    return emitted;
-
-  /// 鏡面
-  if (s_rec.is_specular) {
-    return s_rec.attenuation * ray_color(s_rec.specular_ray, background, world, lights, depth - 1);
-  }
-
-  /// TODO: 蛍光実装する場合はここで分岐??
-  /// if(s_rec.is_fluor) {}
-
-  auto light_pdf = make_shared<hittable_pdf>(lights, rec.p);
-  mixture_pdf mixture_pdf(light_pdf, s_rec.pdf_ptr);
-
-  ray scattered = ray(rec.p, mixture_pdf.generate(), r.time());
-  auto pdf_val = mixture_pdf.value(scattered.direction());
-
-  auto ray_c = ray_color(scattered, background, world, lights, depth - 1);
-
-  /// 再起処理
-  return emitted + s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c / pdf_val;
-}
-
-void flush_progress(double progress) {
-  int bar_width = 20;
-  std::cout << "\r [";
-  int pos = bar_width * progress;
-  for (int i = 0; i < bar_width; ++i) {
-    if (i < pos) std::cout << "=";
-    else if (i == pos) std::cout << ">";
-    else std::cout << " ";
-  }
-  std::cout << "] " << int(progress * 100.0) << " %" << std::flush;
-}
+#include "render/path_trace.h"
 
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
@@ -169,7 +113,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
-        col += ray_color(r, background, world, lights, max_depth);
+        col += path_trace(r, background, world, lights, max_depth);
       }
 #ifndef NDEBUG
       progress = double(i + j * nx) / img_size;
