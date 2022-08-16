@@ -18,10 +18,10 @@ add_executable(rtcamp2022
                src/utils/aabb.h
                src/utils/bvh.h
                src/utils/onb.h
-               src/utils/util_funcs.h
-               src/utils/texture.h
                src/utils/perlin.h
                src/utils/rtw_stb_image.h
+               src/utils/texture.h
+               src/utils/util_funcs.h
                src/camera/camera.h
                src/objects/aarect.h
                src/objects/box.h

@@ -9,13 +9,14 @@
 #include "../utils/hittable.h"
 #include "triangle.h"
 
-class geometry : public hittable {
+template<typename mat>
+class geometry : public hittable<mat> {
  public:
   geometry();
   geometry(const char *file_path);
-  geometry(const char *file_path, shared_ptr<material> m);
+  geometry(const char *file_path, shared_ptr<mat> m);
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
   vec3 random(const vec3 &o) const override;
   double pdf_value(const point3 &o, const vec3 &v) const override;
@@ -26,28 +27,31 @@ class geometry : public hittable {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
   std::vector<tinyobj::material_t> materials;
-  std::vector<shared_ptr<triangle>> tris;
+  std::vector<shared_ptr<triangle<mat>>> tris;
 };
 
 // TODO blenderマテリアルを取得
-geometry::geometry(const char *file_path) {
+template<typename mat>
+geometry<mat>::geometry(const char *file_path) {
   std::vector<vertex> vertices;
   load_obj(file_path, vertices);
   for (int i = 0; i < vertices.size() / 3; ++i) {
     shared_ptr<material> m = make_shared<lambertian>(CYAN);
-    tris.push_back(make_shared<triangle>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
+    tris.push_back(make_shared<triangle<mat>>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
   }
 }
 
-geometry::geometry(const char *file_path, shared_ptr<material> m) {
+template<typename mat>
+geometry<mat>::geometry(const char *file_path, shared_ptr<mat> m) {
   std::vector<vertex> vertices;
   load_obj(file_path, vertices);
   for (int i = 0; i < vertices.size() / 3; ++i) {
-    tris.push_back(make_shared<triangle>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
+    tris.push_back(make_shared<triangle<mat>>(vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2], m));
   }
 }
 
-void geometry::load_obj(const char *file_path, std::vector<vertex> &vertices) {
+template<typename mat>
+void geometry<mat>::load_obj(const char *file_path, std::vector<vertex> &vertices) {
   tinyobj::ObjReaderConfig reader_config;
   tinyobj::ObjReader reader;
   reader_config.mtl_search_path = "./assets/obj/";
@@ -112,7 +116,8 @@ void geometry::load_obj(const char *file_path, std::vector<vertex> &vertices) {
   shapes.clear();
 }
 
-bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool geometry<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   long triangles_size = tris.size();
   for (long i = 0; i < triangles_size; ++i) {
     if (tris[i]->hit(r, t_min, t_max, rec)) {
@@ -121,14 +126,20 @@ bool geometry::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
   }
   return false;
 }
-bool geometry::bounding_box(double t0, double t1, aabb &box) const {
+
+template<typename mat>
+bool geometry<mat>::bounding_box(double t0, double t1, aabb &box) const {
   return true;
 }
-vec3 geometry::random(const vec3 &o) const {
-  return hittable::random(o);
+
+template<typename mat>
+vec3 geometry<mat>::random(const vec3 &o) const {
+  return hittable<mat>::random(o);
 }
-double geometry::pdf_value(const point3 &o, const vec3 &v) const {
-  return hittable::pdf_value(o, v);
+
+template<typename mat>
+double geometry<mat>::pdf_value(const point3 &o, const vec3 &v) const {
+  return hittable<mat>::pdf_value(o, v);
 }
 
 #endif //RTCAMP2022_SRC_OBJECTS_GEOMETRY_H_

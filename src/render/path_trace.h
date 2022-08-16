@@ -9,10 +9,10 @@
 
 color inline path_trace(const ray &r,
                         const color &background,
-                        const hittable &world,
-                        shared_ptr<hittable_list> &lights,
+                        const hittable<material> &world,
+                        shared_ptr<hittable_list<material>> &lights,
                         int depth) {
-  hit_record rec;
+  hit_record<material> rec;
 
   /// レイの最大反射後
   if (depth <= 0) {
@@ -40,7 +40,7 @@ color inline path_trace(const ray &r,
   /// TODO: 蛍光実装する場合はここで分岐??
   /// if(s_rec.is_fluor) {}
 
-  auto light_pdf = make_shared<hittable_pdf>(lights, rec.p);
+  auto light_pdf = make_shared<hittable_pdf<material>>(lights, rec.p);
   mixture_pdf mixture_pdf(light_pdf, s_rec.pdf_ptr);
 
   ray scattered = ray(rec.p, mixture_pdf.generate(), r.time());

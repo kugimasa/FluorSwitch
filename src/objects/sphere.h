@@ -6,11 +6,12 @@
 
 #include "../utils/hittable.h"
 
-class sphere : public hittable {
+template<typename mat>
+class sphere : public hittable<mat> {
  public:
   sphere();
-  sphere(vec3 cen, double r, shared_ptr<material> m) : center(cen), radius(r), mat_ptr(m) {};
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  sphere(vec3 cen, double r, shared_ptr<mat> m) : center(cen), radius(r), mat_ptr(m) {};
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double time0, double time1, aabb &box) const override;
   double pdf_value(const point3 &o, const vec3 &v) const override;
   vec3 random(const vec3 &o) const override;
@@ -18,7 +19,7 @@ class sphere : public hittable {
  public:
   vec3 center;
   double radius;
-  shared_ptr<material> mat_ptr;
+  shared_ptr<mat> mat_ptr;
 
  private:
   static void get_sphere_uv(const point3 &p, double &u, double &v) {
@@ -30,7 +31,8 @@ class sphere : public hittable {
   }
 };
 
-bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool sphere<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   vec3 oc = r.origin() - center;
   double a = r.direction().squared_length();
   double half_b = dot(oc, r.direction());
@@ -61,13 +63,15 @@ bool sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) cons
   return true;
 }
 
-bool sphere::bounding_box(double t0, double t1, aabb &box) const {
+template<typename mat>
+bool sphere<mat>::bounding_box(double t0, double t1, aabb &box) const {
   vec3 scale = vec3(radius, radius, radius);
   box = aabb(center - scale, center + scale);
   return true;
 }
 
-vec3 sphere::random(const vec3 &o) const {
+template<typename mat>
+vec3 sphere<mat>::random(const vec3 &o) const {
   vec3 direction = center - o;
   auto distance_squared = direction.squared_length();
   onb uvw;
@@ -75,8 +79,9 @@ vec3 sphere::random(const vec3 &o) const {
   return uvw.local(random_to_sphere(radius, distance_squared));
 }
 
-double sphere::pdf_value(const point3 &o, const vec3 &v) const {
-  hit_record rec;
+template<typename mat>
+double sphere<mat>::pdf_value(const point3 &o, const vec3 &v) const {
+  hit_record<mat> rec;
   if (!this->hit(ray(o, v), 0.001, INF, rec)) {
     return 0;
   }
@@ -88,7 +93,8 @@ double sphere::pdf_value(const point3 &o, const vec3 &v) const {
 }
 
 /// 移動球
-class moving_sphere : public hittable {
+template<typename mat>
+class moving_sphere : public hittable<mat> {
  public:
   moving_sphere() {}
   moving_sphere(vec3 cen0, vec3 cen1,
@@ -99,23 +105,25 @@ class moving_sphere : public hittable {
       time0(t0), time1(t1),
       radius(r),
       mat_ptr(m) {};
-  virtual bool hit(const ray &r, double tmin, double tmax, hit_record &rec) const override;
+  virtual bool hit(const ray &r, double tmin, double tmax, hit_record<mat> &rec) const override;
   virtual bool bounding_box(double t0, double t1, aabb &box) const override;
   vec3 center(double time) const;
   vec3 center0, center1;
   double time0, time1;
   double radius;
-  shared_ptr<material> mat_ptr;
+  shared_ptr<mat> mat_ptr;
 };
 
 /// time0 から time1の間で移動する球の
 /// 時刻 t における中心座標
-vec3 moving_sphere::center(double time) const {
+template<typename mat>
+vec3 moving_sphere<mat>::center(double time) const {
   return center0 + ((time - time0) / (time1 - time0)) * (center1 - center0);
 }
 
 /// 交差判定
-bool moving_sphere::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool moving_sphere<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   vec3 oc = r.origin() - center(r.time());
   double a = dot(r.direction(), r.direction());
   double b = dot(oc, r.direction());
@@ -143,7 +151,8 @@ bool moving_sphere::hit(const ray &r, double t_min, double t_max, hit_record &re
   return false;
 }
 
-bool moving_sphere::bounding_box(double t0, double t1, aabb &box) const {
+template<typename mat>
+bool moving_sphere<mat>::bounding_box(double t0, double t1, aabb &box) const {
   vec3 scale = vec3(radius, radius, radius);
   aabb box0(center(t0) - scale, center(t0) + scale);
   aabb box1(center(t1) - scale, center(t1) + scale);

@@ -4,33 +4,35 @@
 #include "../utils/hittable.h"
 #include "../material/material.h"
 
-class constant_medium : public hittable {
+template<typename mat>
+class constant_medium : public hittable<mat> {
  public:
-  constant_medium(shared_ptr<hittable> b, double d, shared_ptr<texture> a)
+  constant_medium(shared_ptr<hittable<mat>> b, double d, shared_ptr<texture> a)
       : boundary(b),
         neg_inv_density(-1 / d),
         phase_function(make_shared<isotropic>(a)) {}
 
-  constant_medium(shared_ptr<hittable> b, double d, color c)
+  constant_medium(shared_ptr<hittable<mat>> b, double d, color c)
       : boundary(b),
         neg_inv_density(-1 / d),
         phase_function(make_shared<isotropic>(c)) {}
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
 
   bool bounding_box(double t0, double t1, aabb &box) const override {
     return boundary->bounding_box(t0, t1, box);
   }
 
  public:
-  shared_ptr<hittable> boundary;
-  shared_ptr<material> phase_function;
+  shared_ptr<hittable<mat>> boundary;
+  shared_ptr<mat> phase_function;
   double neg_inv_density;
 };
 
-bool constant_medium::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool constant_medium<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
 
-  hit_record rec1, rec2;
+  hit_record<mat> rec1, rec2;
 
   if (!boundary->hit(r, -INF, INF, rec1)) {
     return false;

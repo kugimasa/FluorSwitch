@@ -38,15 +38,15 @@ struct scattered_record {
 
 class material {
  public:
-  virtual bool scatter(const ray &r_in, const hit_record &rec, scattered_record &s_rec) const {
+  virtual bool scatter(const ray &r_in, const hit_record<material> &rec, scattered_record &s_rec) const {
     return false;
   }
 
-  virtual double scattering_pdf(const ray &r_in, const hit_record &rec, const ray &scattered) const {
+  virtual double scattering_pdf(const ray &r_in, const hit_record<material> &rec, const ray &scattered) const {
     return 0;
   }
 
-  virtual color emitted(const ray &r_in, const hit_record &rec, double u, double v, const point3 &p) const {
+  virtual color emitted(const ray &r_in, const hit_record<material> &rec, double u, double v, const point3 &p) const {
     return BLACK;
   };
 };
@@ -57,14 +57,14 @@ class lambertian : public material {
   lambertian(const color &a) : albedo(make_shared<solid_color>(a)) {}
   lambertian(shared_ptr<texture> a) : albedo(a) {}
 
-  virtual bool scatter(const ray &r_in, const hit_record &rec, scattered_record &s_rec) const {
+  virtual bool scatter(const ray &r_in, const hit_record<material> &rec, scattered_record &s_rec) const {
     s_rec.is_specular = false;
     s_rec.attenuation = albedo->value(rec.u, rec.v, rec.p);
     s_rec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
     return true;
   }
 
-  double scattering_pdf(const ray &r_in, const hit_record &rec, const ray &scattered) const {
+  double scattering_pdf(const ray &r_in, const hit_record<material> &rec, const ray &scattered) const {
     auto cos = dot(rec.normal, unit_vector(scattered.direction()));
     return cos < 0 ? 0 : cos * M_1_PI;
   }
@@ -78,7 +78,7 @@ class metal : public material {
   metal(const vec3 &a) : albedo(a) {}
   metal(const vec3 &a, double f) : albedo(a) { if (f < 1) fuzz = f; else fuzz = 1; }
 
-  bool scatter(const ray &r_in, const hit_record &rec, scattered_record &s_rec) const override {
+  bool scatter(const ray &r_in, const hit_record<material> &rec, scattered_record &s_rec) const override {
     vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
     s_rec.specular_ray = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
     s_rec.attenuation = albedo;
@@ -95,7 +95,7 @@ class metal : public material {
 class dielectric : public material {
  public:
   dielectric(double refraction_index) : ref_idx(refraction_index) {}
-  virtual bool scatter(const ray &r_in, const hit_record &rec, scattered_record &s_rec) const {
+  virtual bool scatter(const ray &r_in, const hit_record<material> &rec, scattered_record &s_rec) const {
     s_rec.is_specular = true;
     s_rec.pdf_ptr = nullptr;
     s_rec.attenuation = WHITE;
@@ -127,7 +127,7 @@ class isotropic : public material {
   isotropic(color c) : albedo(make_shared<solid_color>(c)) {}
   isotropic(shared_ptr<texture> a) : albedo(a) {}
 
-  bool scatter(const ray &r_in, const hit_record &rec, scattered_record &s_rec) const override {
+  bool scatter(const ray &r_in, const hit_record<material> &rec, scattered_record &s_rec) const override {
     // TODO: Henyey and Greensteinの位相関数
     // 位相関数
     s_rec.is_specular = true;

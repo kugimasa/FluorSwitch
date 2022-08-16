@@ -10,7 +10,8 @@ struct vertex {
   double u, v;
 };
 
-class triangle : public hittable {
+template<typename mat>
+class triangle : public hittable<mat> {
  public:
   triangle();
   triangle(vertex v0, vertex v1, vertex v2, shared_ptr<material> m) {
@@ -49,7 +50,7 @@ class triangle : public hittable {
     mat_ptr = m;
   };
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double time0, double time1, aabb &box) const override {
     vec3 a, b;
     for (int i = 0; i < 3; ++i) {
@@ -69,10 +70,11 @@ class triangle : public hittable {
   vec3 face_norm, e1, e2;
   double u[3];
   double v[3];
-  shared_ptr<material> mat_ptr;
+  shared_ptr<mat> mat_ptr;
 };
 
-bool triangle::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool triangle<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   /// Möller–Trumbore intersection algorithm
   vec3 p_vec = cross(r.direction(), e2);
   // 行列式
@@ -103,8 +105,9 @@ bool triangle::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
   return true;
 }
 
-double triangle::pdf_value(const point3 &o, const vec3 &v) const {
-  hit_record rec;
+template<typename mat>
+double triangle<mat>::pdf_value(const point3 &o, const vec3 &v) const {
+  hit_record<mat> rec;
   if (!this->hit(ray(o, v), 0.001, INF, rec)) {
     return 0;
   }
@@ -116,13 +119,15 @@ double triangle::pdf_value(const point3 &o, const vec3 &v) const {
   return distance_squared / (cosine * area);
 }
 
-vec3 triangle::random(const vec3 &o) const {
+template<typename mat>
+vec3 triangle<mat>::random(const vec3 &o) const {
   auto k = random_double(0, 1);
   auto random_point = e1 * k + e2 * (1 - k);
   return random_point - o;
 }
 
-vec3 triangle::barycentric(vec3 &p) {
+template<typename mat>
+vec3 triangle<mat>::barycentric(vec3 &p) {
   vec3 t = p - vert[0];
   double d00 = dot(e1, e1);
   double d01 = dot(e1, e2);

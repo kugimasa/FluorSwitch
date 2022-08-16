@@ -6,25 +6,27 @@
 #include "hittable_list.h"
 #include "../objects/geometry.h"
 
-class bvh_node : public hittable {
+template<typename mat>
+class bvh_node : public hittable<mat> {
  public:
   bvh_node() {}
-  bvh_node(const shared_ptr<geometry> &obj, double t0, double t1)
+  bvh_node(const shared_ptr<geometry<mat>> &obj, double t0, double t1)
       : bvh_node(obj->tris, 0, obj->tris.size(), t0, t1) {}
 
-  bvh_node(const std::vector<shared_ptr<triangle>> &tris, size_t start, size_t end, double t0, double t1);
+  bvh_node(const std::vector<shared_ptr<triangle<mat>>> &tris, size_t start, size_t end, double t0, double t1);
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
 
  public:
   // 子ノード
-  shared_ptr<hittable> left;
-  shared_ptr<hittable> right;
+  shared_ptr<hittable<mat>> left;
+  shared_ptr<hittable<mat>> right;
   aabb box;
 };
 
-inline bool box_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b, int axis) {
+template<typename mat>
+inline bool box_compare(const shared_ptr<hittable<mat>> a, const shared_ptr<hittable<mat>> b, int axis) {
   aabb box_a;
   aabb box_b;
   if (!a->bounding_box(0, 0, box_a) || !b->bounding_box(0, 0, box_b)) {
@@ -33,28 +35,32 @@ inline bool box_compare(const shared_ptr<hittable> a, const shared_ptr<hittable>
   return box_a.min().e[axis] < box_b.min().e[axis];
 }
 
-bool box_x_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
+template<typename mat>
+bool box_x_compare(const shared_ptr<hittable<mat>> a, const shared_ptr<hittable<mat>> b) {
   return box_compare(a, b, 0);
 }
-bool box_y_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
+template<typename mat>
+bool box_y_compare(const shared_ptr<hittable<mat>> a, const shared_ptr<hittable<mat>> b) {
   return box_compare(a, b, 1);
 }
-bool box_z_compare(const shared_ptr<hittable> a, const shared_ptr<hittable> b) {
+template<typename mat>
+bool box_z_compare(const shared_ptr<hittable<mat>> a, const shared_ptr<hittable<mat>> b) {
   return box_compare(a, b, 2);
 }
 
-bvh_node::bvh_node(const std::vector<shared_ptr<triangle>> &tris,
-                   size_t start,
-                   size_t end,
-                   double t0,
-                   double t1) {
+template<typename mat>
+bvh_node<mat>::bvh_node(const std::vector<shared_ptr<triangle<mat>>> &tris,
+                        size_t start,
+                        size_t end,
+                        double t0,
+                        double t1) {
 
   auto objects = tris;
   // チェックする軸をX,Y,Zからランダムで選択
   int axis = int(3 * drand48());
-  auto comparator = (axis == 0) ? box_x_compare
-                                : (axis == 1) ? box_y_compare
-                                              : box_z_compare;
+  auto comparator = (axis == 0) ? box_x_compare<mat>
+                                : (axis == 1) ? box_y_compare<mat>
+                                              : box_z_compare<mat>;
 
   size_t object_span = end - start;
 
@@ -89,12 +95,14 @@ bvh_node::bvh_node(const std::vector<shared_ptr<triangle>> &tris,
   box = surrounding_box(box_left, box_right);
 }
 
-bool bvh_node::bounding_box(double t0, double t1, aabb &output_box) const {
+template<typename mat>
+bool bvh_node<mat>::bounding_box(double t0, double t1, aabb &output_box) const {
   output_box = box;
   return true;
 }
 
-bool bvh_node::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool bvh_node<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   if (!box.hit(r, t_min, t_max)) {
     return false;
   }

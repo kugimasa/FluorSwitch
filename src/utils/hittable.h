@@ -9,11 +9,12 @@
 
 class material;
 
+template<typename mat>
 struct hit_record {
   double t;
   vec3 p;
   vec3 normal;
-  shared_ptr<material> mat_ptr;
+  shared_ptr<mat> mat_ptr;
   double u;
   double v;
   bool front_face;
@@ -24,9 +25,10 @@ struct hit_record {
   }
 };
 
+template<typename mat>
 class hittable {
  public:
-  virtual bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const = 0;
+  virtual bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const = 0;
   virtual bool bounding_box(double t0, double t1, aabb &box) const = 0;
   virtual double pdf_value(const point3 &o, const vec3 &v) const {
     return 0.0;
@@ -37,19 +39,21 @@ class hittable {
   }
 };
 
-class translate : public hittable {
+template<typename mat>
+class translate : public hittable<mat> {
  public:
-  translate(shared_ptr<hittable> p, const vec3 &displacement) : ptr(p), offset(displacement) {}
+  translate(shared_ptr<hittable<mat>> p, const vec3 &displacement) : ptr(p), offset(displacement) {}
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double time0, double time1, aabb &output_box) const override;
 
  public:
-  shared_ptr<hittable> ptr;
+  shared_ptr<hittable<mat>> ptr;
   vec3 offset;
 };
 
-bool translate::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool translate<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   ray moved_r(r.origin() - offset, r.direction(), r.time());
   if (!ptr->hit(moved_r, t_min, t_max, rec)) {
     return false;
@@ -61,7 +65,8 @@ bool translate::hit(const ray &r, double t_min, double t_max, hit_record &rec) c
   return true;
 }
 
-bool translate::bounding_box(double time0, double time1, aabb &output_box) const {
+template<typename mat>
+bool translate<mat>::bounding_box(double time0, double time1, aabb &output_box) const {
   if (!ptr->bounding_box(time0, time1, output_box)) {
     return false;
   }
@@ -70,25 +75,27 @@ bool translate::bounding_box(double time0, double time1, aabb &output_box) const
   return true;
 }
 
-class rotate_y : public hittable {
+template<typename mat>
+class rotate_y : public hittable<mat> {
  public:
-  rotate_y(shared_ptr<hittable> p, double angle);
+  rotate_y(shared_ptr<hittable<mat>> p, double angle);
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override {
     box = bbox;
     return has_box;
   }
 
  public:
-  shared_ptr<hittable> ptr;
+  shared_ptr<hittable<mat>> ptr;
   double sin_theta;
   double cos_theta;
   bool has_box;
   aabb bbox;
 };
 
-rotate_y::rotate_y(shared_ptr<hittable> p, double angle) : ptr(p) {
+template<typename mat>
+rotate_y<mat>::rotate_y(shared_ptr<hittable<mat>> p, double angle) : ptr(p) {
   auto radians = degrees_to_radians(angle);
   sin_theta = sin(radians);
   cos_theta = cos(radians);
@@ -120,7 +127,8 @@ rotate_y::rotate_y(shared_ptr<hittable> p, double angle) : ptr(p) {
   bbox = aabb(min, max);
 }
 
-bool rotate_y::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool rotate_y<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   auto origin = r.origin();
   auto direction = r.direction();
 
@@ -151,11 +159,12 @@ bool rotate_y::hit(const ray &r, double t_min, double t_max, hit_record &rec) co
   return true;
 }
 
-class flip_face : public hittable {
+template<typename mat>
+class flip_face : public hittable<mat> {
  public:
-  flip_face(shared_ptr<hittable> p) : ptr(p) {}
+  flip_face(shared_ptr<hittable<mat>> p) : ptr(p) {}
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override {
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override {
     if (!ptr->hit(r, t_min, t_max, rec)) {
       return false;
     }
@@ -169,7 +178,7 @@ class flip_face : public hittable {
   }
 
  public:
-  shared_ptr<hittable> ptr;
+  shared_ptr<hittable<mat>> ptr;
 };
 
 #endif //RAY_UTILS_HITTABLE_H_

@@ -11,31 +11,33 @@
 using std::shared_ptr;
 using std::make_shared;
 
-class hittable_list : public hittable {
+template<typename mat>
+class hittable_list : public hittable<mat> {
  public:
   hittable_list() {}
-  hittable_list(shared_ptr<hittable> object) { add(object); }
+  hittable_list(shared_ptr<hittable<mat>> object) { add(object); }
   hittable_list(shared_ptr<hittable_list> object_list) { add(object_list); }
 
   void clear() { objects.clear(); }
-  void add(shared_ptr<hittable> object) { objects.push_back(object); }
+  void add(shared_ptr<hittable<mat>> object) { objects.push_back(object); }
   void add(shared_ptr<hittable_list> object_list) {
-    for (shared_ptr<hittable> o: object_list->objects) {
+    for (shared_ptr<hittable<mat>> o: object_list->objects) {
       objects.push_back(o);
     }
   }
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double t0, double t1, aabb &box) const override;
   double pdf_value(const point3 &o, const vec3 &v) const override;
   vec3 random(const vec3 &o) const override;
 
  public:
-  std::vector<shared_ptr<hittable>> objects;
+  std::vector<shared_ptr<hittable<mat>>> objects;
 };
 
-bool hittable_list::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
-  hit_record temp_rec;
+template<typename mat>
+bool hittable_list<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
+  hit_record<mat> temp_rec;
   bool hit_anything = false;
   double closest_so_far = t_max;
 
@@ -50,7 +52,8 @@ bool hittable_list::hit(const ray &r, double t_min, double t_max, hit_record &re
   return hit_anything;
 }
 
-bool hittable_list::bounding_box(double t0, double t1, aabb &box) const {
+template<typename mat>
+bool hittable_list<mat>::bounding_box(double t0, double t1, aabb &box) const {
   // リストが空の場合、リターン
   if (objects.empty()) {
     return false;
@@ -70,7 +73,8 @@ bool hittable_list::bounding_box(double t0, double t1, aabb &box) const {
   return true;
 }
 
-double hittable_list::pdf_value(const point3 &o, const vec3 &v) const {
+template<typename mat>
+double hittable_list<mat>::pdf_value(const point3 &o, const vec3 &v) const {
   auto weight = 1.0 / objects.size();
   auto sum = 0.0;
 
@@ -80,7 +84,8 @@ double hittable_list::pdf_value(const point3 &o, const vec3 &v) const {
   return sum;
 }
 
-vec3 hittable_list::random(const vec3 &o) const {
+template<typename mat>
+vec3 hittable_list<mat>::random(const vec3 &o) const {
   auto int_size = static_cast<int>(objects.size());
   return objects[random_int(0, int_size - 1)]->random(o);
 }

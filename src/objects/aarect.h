@@ -5,21 +5,22 @@
 #include "../utils/hittable.h"
 
 /// XY面
-class xy_rect : public hittable {
+template<typename mat>
+class xy_rect : public hittable<mat> {
  public:
   xy_rect() {}
 
-  xy_rect(double x_0, double x_1, double y_0, double y_1, double z, shared_ptr<material> mat)
-      : x0(x_0), x1(x_1), y0(y_0), y1(y_1), k(z), mp(mat) {};
+  xy_rect(double x_0, double x_1, double y_0, double y_1, double z, shared_ptr<mat> m)
+      : x0(x_0), x1(x_1), y0(y_0), y1(y_1), k(z), mp(m) {};
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double time0, double time1, aabb &box) const override {
     box = aabb(point3(x0, y0, k - 0.0001), point3(x1, y1, k + 0.0001));
     return true;
   }
 
   double pdf_value(const point3 &o, const vec3 &v) const override {
-    hit_record rec;
+    hit_record<mat> rec;
     if (!this->hit(ray(o, v), 0.001, INF, rec)) {
       return 0;
     }
@@ -37,11 +38,12 @@ class xy_rect : public hittable {
   }
 
  public:
-  shared_ptr<material> mp;
+  shared_ptr<mat> mp;
   double x0, x1, y0, y1, k;
 };
 
-bool xy_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool xy_rect<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   auto t = (k - r.origin().z()) / r.direction().z();
   if (t < t_min || t_max < t) {
     return false;
@@ -62,21 +64,22 @@ bool xy_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) con
 }
 
 /// XZ面
-class xz_rect : public hittable {
+template<typename mat>
+class xz_rect : public hittable<mat> {
  public:
   xz_rect() {}
 
-  xz_rect(double x_0, double x_1, double z_0, double z_1, double y, shared_ptr<material> mat)
-      : x0(x_0), x1(x_1), z0(z_0), z1(z_1), k(y), mp(mat) {};
+  xz_rect(double x_0, double x_1, double z_0, double z_1, double y, shared_ptr<mat> m)
+      : x0(x_0), x1(x_1), z0(z_0), z1(z_1), k(y), mp(m) {};
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double time0, double time1, aabb &box) const override {
     box = aabb(point3(x0, k - 0.0001, z0), point3(x1, k + 0.0001, z1));
     return true;
   }
 
   double pdf_value(const point3 &o, const vec3 &v) const override {
-    hit_record rec;
+    hit_record<mat> rec;
     if (!this->hit(ray(o, v), 0.001, INF, rec)) {
       return 0;
     }
@@ -98,7 +101,8 @@ class xz_rect : public hittable {
   double x0, x1, z0, z1, k;
 };
 
-bool xz_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool xz_rect<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   auto t = (k - r.origin().y()) / r.direction().y();
   if (t < t_min || t_max < t) {
     return false;
@@ -119,21 +123,22 @@ bool xz_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) con
 }
 
 /// YZ面
-class yz_rect : public hittable {
+template<typename mat>
+class yz_rect : public hittable<mat> {
  public:
   yz_rect() {}
 
-  yz_rect(double y_0, double y_1, double z_0, double z_1, double x, shared_ptr<material> mat)
-      : y0(y_0), y1(y_1), z0(z_0), z1(z_1), k(x), mp(mat) {};
+  yz_rect(double y_0, double y_1, double z_0, double z_1, double x, shared_ptr<mat> m)
+      : y0(y_0), y1(y_1), z0(z_0), z1(z_1), k(x), mp(m) {};
 
-  bool hit(const ray &r, double t_min, double t_max, hit_record &rec) const override;
+  bool hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const override;
   bool bounding_box(double time0, double time1, aabb &box) const override {
     box = aabb(point3(k - 0.0001, y0, z0), point3(k + 0.0001, y1, z1));
     return true;
   }
 
   double pdf_value(const point3 &o, const vec3 &v) const override {
-    hit_record rec;
+    hit_record<mat> rec;
     if (!this->hit(ray(o, v), 0.001, INF, rec)) {
       return 0;
     }
@@ -155,7 +160,8 @@ class yz_rect : public hittable {
   double y0, y1, z0, z1, k;
 };
 
-bool yz_rect::hit(const ray &r, double t_min, double t_max, hit_record &rec) const {
+template<typename mat>
+bool yz_rect<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &rec) const {
   auto t = (k - r.origin().x()) / r.direction().x();
   if (t < t_min || t_max < t) {
     return false;

@@ -53,9 +53,10 @@ class cosine_pdf : public pdf {
   onb uvw;
 };
 
+template<typename mat>
 class hittable_pdf : public pdf {
  public:
-  hittable_pdf(shared_ptr<hittable> p, const point3 &origin) : ptr(p), o(origin) {}
+  hittable_pdf(shared_ptr<hittable<mat>> p, const point3 &origin) : ptr(p), o(origin) {}
 
   double value(const vec3 &direction) const override {
     return ptr->pdf_value(o, direction);
@@ -66,7 +67,7 @@ class hittable_pdf : public pdf {
   }
  public:
   point3 o;
-  shared_ptr<hittable> ptr;
+  shared_ptr<hittable<mat>> ptr;
 };
 
 class mixture_pdf : public pdf {
