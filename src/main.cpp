@@ -18,6 +18,7 @@
 #include "utils/my_print.h"
 #include "utils/bvh.h"
 #include "render/path_trace.h"
+#include "utils/spectral_distribution.h"
 
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
@@ -186,7 +187,11 @@ void execute() {
 
 int main() {
   // 読み込みのテスト
-  // const auto blue_spectra = spectral_distribution("./assets/spectra/macbeth_08_purplish_blue.csv");
+  const auto blue_spectra = spectral_distribution("./assets/spectra/macbeth_08_purplish_blue.csv");
+  const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_moderate_red.csv");
+  const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
+  const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
+  const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
 
   // 実行開始
   std::thread timer(program_timer);

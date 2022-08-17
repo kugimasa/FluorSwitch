@@ -20,6 +20,7 @@ add_executable(rtcamp2022
                src/utils/onb.h
                src/utils/perlin.h
                src/utils/rtw_stb_image.h
+               src/utils/spectral_distribution.h
                src/utils/texture.h
                src/utils/util_funcs.h
                src/camera/camera.h
@@ -33,6 +34,7 @@ add_executable(rtcamp2022
                src/sampling/pdf.h
                src/material/material.h
                src/material/light.h
+               src/material/spectral_material.h
                src/render/path_trace.h)
 
 include_directories("external/stb")

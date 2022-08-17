@@ -1,0 +1,52 @@
+#ifndef RTCAMP2022_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
+#define RTCAMP2022_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
+#include "../utils/texture.h"
+#include "../utils/onb.h"
+#include "../utils/hittable.h"
+#include "../sampling/pdf.h"
+#include "../utils/spectral_distribution.h"
+
+struct spectral_scattered_record {
+  ray specular_ray;
+  bool is_specular;
+  shared_ptr<spectral_distribution> attenuation;
+  shared_ptr<pdf> pdf_ptr;
+};
+
+class spectral_material {
+ public:
+  virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, spectral_scattered_record &s_rec) const {
+    return false;
+  }
+
+  virtual double scattering_pdf(const ray &r_in, const hit_record<spectral_material> &rec, const ray &scattered) const {
+    return 0;
+  }
+
+  virtual spectral_distribution emitted(const ray &r_in, const hit_record<spectral_material> &rec, double u, double v, const point3 &p) const {
+    // TODO: BLACK
+    return spectral_distribution();
+  };
+};
+
+/// 拡散反射面
+class spectral_lambertian : public spectral_material {
+ public:
+  spectral_lambertian(shared_ptr<spectral_distribution> a) : albedo(a) {}
+
+  virtual bool scatter(const ray &r_in, const hit_record<material> &rec, spectral_scattered_record &s_rec) const {
+    s_rec.is_specular = false;
+    s_rec.attenuation = albedo;
+    s_rec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
+    return true;
+  }
+
+  double scattering_pdf(const ray &r_in, const hit_record<material> &rec, const ray &scattered) const {
+    auto cos = dot(rec.normal, unit_vector(scattered.direction()));
+    return cos < 0 ? 0 : cos * M_1_PI;
+  }
+
+  shared_ptr<spectral_distribution> albedo;
+};
+
+#endif //RTCAMP2022_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
