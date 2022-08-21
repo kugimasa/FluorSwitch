@@ -35,11 +35,11 @@ class cornell_box : public hittable_list<mat> {
               shared_ptr<mat> back_mat) {
 
     /// Cornell壁
-    this->objects.push_back(make_shared<yz_rect>(0, box_size, 0, box_size, 0, right_mat));
-    this->objects.push_back(make_shared<yz_rect>(0, box_size, 0, box_size, box_size, left_mat));
-    this->objects.push_back(make_shared<xz_rect>(0, box_size, 0, box_size, 0, bottom_mat));
-    this->objects.push_back(make_shared<xz_rect>(0, box_size, 0, box_size, box_size, top_mat));
-    this->objects.push_back(make_shared<xy_rect>(0, box_size, 0, box_size, box_size, back_mat));
+    this->objects.push_back(make_shared<yz_rect<mat>>(0, box_size, 0, box_size, 0, right_mat));
+    this->objects.push_back(make_shared<yz_rect<mat>>(0, box_size, 0, box_size, box_size, left_mat));
+    this->objects.push_back(make_shared<xz_rect<mat>>(0, box_size, 0, box_size, 0, bottom_mat));
+    this->objects.push_back(make_shared<xz_rect<mat>>(0, box_size, 0, box_size, box_size, top_mat));
+    this->objects.push_back(make_shared<xy_rect<mat>>(0, box_size, 0, box_size, box_size, back_mat));
   }
 
 };

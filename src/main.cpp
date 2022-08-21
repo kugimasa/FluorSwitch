@@ -5,6 +5,8 @@
 #include "camera/camera.h"
 #include "material/material.h"
 #include "material/light.h"
+#include "material/spectral_material.h"
+#include "material/spectral_light.h"
 #include "objects/sphere.h"
 #include "objects/aarect.h"
 #include "objects/box.h"
@@ -15,10 +17,11 @@
 #include "sampling/pdf.h"
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
+#include "utils/spectral_distribution.h"
 #include "utils/my_print.h"
 #include "utils/bvh.h"
 #include "render/path_trace.h"
-#include "utils/spectral_distribution.h"
+#include "render/spectral_path_trace.h"
 
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
@@ -50,29 +53,27 @@ void drawPix(unsigned char *data,
 }
 
 // 30fps * 5 sec
-#define MAX_FRAME 10
+#define MAX_FRAME 1
 void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int frame = 1) {
   /// シーンデータ
-  hittable_list<material> world;
-
-  auto red = color(.65, .05, .05);
-  auto white = color(.73, .73, .73);
-  auto green = color(.12, .45, .15);
-  auto blue = color(.05, .05, .65);
-  auto light = color(7, 7, 7);
+  hittable_list<spectral_material> world;
 
   /// マテリアル設定
-  auto red_mat = make_shared<lambertian>(red);
-  auto white_mat = make_shared<lambertian>(white);
-  auto green_mat = make_shared<lambertian>(green);
-  auto blue_mat = make_shared<lambertian>(blue);
-  auto kugi_mat = make_shared<lambertian>(KUGI_COLOR);
-
+  auto blue_mat = make_shared<spectral_lambertian>(blue_spectra);
+  auto red_mat = make_shared<spectral_lambertian>(red_spectra);
+  auto white_mat = make_shared<spectral_lambertian>(white_spectra);
+  auto black_mat = make_shared<spectral_lambertian>(black_spectra);
   /// 光源設定
-  auto light_mat = make_shared<diffuse_light>(light);
+  auto light_mat = make_shared<spectral_diffuse_light>(d65_spectra);
+  
+//  auto blue = spectralToRgb(blue_spectra);
+//  auto red = spectralToRgb(red_spectra);
+//  auto white = spectralToRgb(white_spectra);
+//  auto black = spectralToRgb(black_spectra);
+//  auto light = spectralToRgb(d65_spectra);
 
-  cornell_box<material> cb = cornell_box<material>(555, 150, red_mat, green_mat, white_mat, white_mat, blue_mat, light_mat);
-  world.add(make_shared<hittable_list<material>>(cb));
+  cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
+  world.add(make_shared<hittable_list<spectral_material>>(cb));
 
 //  std::cout << "+++++++++ Load Obj +++++++++" << std::endl;
 //  // OBJモデルの読み込み
@@ -85,11 +86,11 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
   double f = (double) frame / (MAX_FRAME * 2);
   double offset = 50;
   double radius = 90 + sin(f * 2 * M_PI) * offset;
-  world.add(make_shared<sphere<material>>(vec3(radius + 100, 90, radius + 100), radius, kugi_mat));
+  world.add(make_shared<sphere<spectral_material>>(vec3(radius + 100, 90, radius + 100), radius, black_mat));
 
-  auto lights = make_shared<hittable_list<material>>();
+  auto lights = make_shared<hittable_list<spectral_material>>();
   /// 光源サンプル用
-  lights->add(make_shared<xz_rect<material>>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<material>()));
+  lights->add(make_shared<xz_rect<spectral_material>>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<spectral_material>()));
 
   /// 背景
   color background = BLACK;
@@ -114,7 +115,8 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
-        col += path_trace(r, background, world, lights, max_depth);
+        auto spectra(spectral_path_trace(r, black_spectra, world, lights, max_depth));
+        col += spectralToRgb(spectra);
       }
 #ifndef NDEBUG
       progress = double(i + j * nx) / img_size;
@@ -131,7 +133,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 1;
+  int ns = 25;
   std::cout << "PPS: " << ns << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
@@ -186,13 +188,6 @@ void execute() {
 }
 
 int main() {
-  // 読み込みのテスト
-  const auto blue_spectra = spectral_distribution("./assets/spectra/macbeth_08_purplish_blue.csv");
-  const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_moderate_red.csv");
-  const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
-  const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
-  const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
-
   // 実行開始
   std::thread timer(program_timer);
   std::thread exec(execute);

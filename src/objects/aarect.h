@@ -97,7 +97,7 @@ class xz_rect : public hittable<mat> {
   }
 
  public:
-  shared_ptr<material> mp;
+  shared_ptr<mat> mp;
   double x0, x1, z0, z1, k;
 };
 
@@ -156,7 +156,7 @@ class yz_rect : public hittable<mat> {
   }
 
  public:
-  shared_ptr<material> mp;
+  shared_ptr<mat> mp;
   double y0, y1, z0, z1, k;
 };
 
