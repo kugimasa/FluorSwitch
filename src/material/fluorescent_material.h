@@ -8,7 +8,6 @@ class fluorescent_material : public spectral_material {
   fluorescent_material(spectral_distribution a) : albedo(a) {}
 
   virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, spectral_scattered_record &s_rec) const {
-    s_rec.is_fluorescent = true;
     s_rec.attenuation = albedo + (emission * excitation * eta);
     s_rec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
     return true;
