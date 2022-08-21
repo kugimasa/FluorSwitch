@@ -24,9 +24,11 @@ class spectral_material {
   }
 
   virtual spectral_distribution emitted(const ray &r_in, const hit_record<spectral_material> &rec, double u, double v, const point3 &p) const {
-    /// TODO: BLACK
-    return black_spectra;
+    return zero_spectra;
   };
+
+ public:
+  spectral_distribution zero_spectra{black_spectra, 0};
 };
 
 /// 拡散反射面

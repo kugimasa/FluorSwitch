@@ -14,14 +14,15 @@
 #include "objects/cornell_box.h"
 #include "objects/geometry.h"
 #include "objects/triangle.h"
+#include "render/path_trace.h"
+#include "render/spectral_path_trace.h"
 #include "sampling/pdf.h"
+#include "scene/scene.h"
 #include "utils/hittable_list.h"
 #include "utils/output_file.h"
 #include "utils/spectral_distribution.h"
 #include "utils/my_print.h"
 #include "utils/bvh.h"
-#include "render/path_trace.h"
-#include "render/spectral_path_trace.h"
 
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
@@ -54,46 +55,10 @@ void drawPix(unsigned char *data,
 
 // 30fps * 5 sec
 #define MAX_FRAME 1
-void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int frame = 1) {
-  /// シーンデータ
-  hittable_list<spectral_material> world;
-
-  /// マテリアル設定
-  auto blue_mat = make_shared<spectral_lambertian>(blue_spectra);
-  auto red_mat = make_shared<spectral_lambertian>(red_spectra);
-  auto white_mat = make_shared<spectral_lambertian>(white_spectra);
-  auto black_mat = make_shared<spectral_lambertian>(black_spectra);
-  /// 光源設定
-  auto light_mat = make_shared<spectral_diffuse_light>(d65_spectra);
-  
-//  auto blue = spectralToRgb(blue_spectra);
-//  auto red = spectralToRgb(red_spectra);
-//  auto white = spectralToRgb(white_spectra);
-//  auto black = spectralToRgb(black_spectra);
-//  auto light = spectralToRgb(d65_spectra);
-
-  cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
-  world.add(make_shared<hittable_list<spectral_material>>(cb));
-
-//  std::cout << "+++++++++ Load Obj +++++++++" << std::endl;
-//  // OBJモデルの読み込み
-//  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", glass);
-//  auto obj_bvh = make_shared<translate>(make_shared<bvh_node>(obj, 0, 1), vec3(265, 50, 265));
-//  world.add(obj_bvh);
-//  std::cout << "++++++++++ Finish ++++++++++" << std::endl;
-
-  /// 拡大縮小/移動する球
-  double f = (double) frame / (MAX_FRAME * 2);
-  double offset = 50;
-  double radius = 90 + sin(f * 2 * M_PI) * offset;
-  world.add(make_shared<sphere<spectral_material>>(vec3(radius + 100, 90, radius + 100), radius, black_mat));
-
-  auto lights = make_shared<hittable_list<spectral_material>>();
-  /// 光源サンプル用
-  lights->add(make_shared<xz_rect<spectral_material>>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<spectral_material>()));
-
-  /// 背景
-  color background = BLACK;
+template<typename color_type, typename mat>
+void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
+            color_type background, hittable_list<mat> world, shared_ptr<hittable_list<mat>> &lights,
+            int frame = 1) {
 
   /// カメラ設定
   point3 lookfrom(278.0, 278.0, -800.0);
@@ -115,7 +80,8 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns, int f
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
-        auto spectra(spectral_path_trace(r, black_spectra, world, lights, max_depth));
+        // col += path_trace(r, background, world, lights, max_depth);
+        auto spectra(spectral_path_trace(r, background, world, lights, max_depth));
         col += spectralToRgb(spectra);
       }
 #ifndef NDEBUG
@@ -148,6 +114,10 @@ void execute() {
   std::chrono::system_clock::time_point start, end;
 #endif
 
+  /// シーン背景
+  spectral_distribution background_spectra{black_spectra, 0.0};
+  color background_rgb = BLACK;
+
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {
 #ifndef NDEBUG
     // 時間計測開始
@@ -162,8 +132,11 @@ void execute() {
 
     /// 背景色の指定
     memset(output.data, 0xFF, output.width * output.height * output.ch);
+    /// シーンデータ
+    auto world = construct_spectral_scene(frame, MAX_FRAME);
+    auto lights = construct_spectral_light_sampler();
     /// 描画処理
-    render(output.data, nx, ny, ns, frame);
+    render(output.data, nx, ny, ns, background_spectra, world, lights, frame);
 
     /// PNG出力
     std::ostringstream sout;

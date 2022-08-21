@@ -11,6 +11,7 @@ class spectral_distribution {
  public:
   spectral_distribution() {}
   spectral_distribution(const spectral_distribution &distribution);
+  spectral_distribution(const spectral_distribution &distribution, const double intensity);
   spectral_distribution(const char *file_path);
 
   inline size_t get_index_wavelength() const {
@@ -37,10 +38,6 @@ class spectral_distribution {
     return sum;
   }
 
-  inline void fill(double intensity, size_t size) {
-
-  }
-
   inline spectral_distribution operator+(const spectral_distribution &other) const;
   inline spectral_distribution operator+(double t) const;
   inline spectral_distribution operator-(const spectral_distribution &other) const;
@@ -62,6 +59,17 @@ spectral_distribution::spectral_distribution(const spectral_distribution &distri
   }
   wavelengths = distribution.wavelengths;
   intensities = distribution.intensities;
+}
+
+spectral_distribution::spectral_distribution(const spectral_distribution &distribution, const double intensity) {
+  if (distribution.wavelengths.size() > 0) {
+    index_wavelength = distribution.wavelengths[0];
+  }
+  wavelengths = distribution.wavelengths;
+  intensities = distribution.intensities;
+  for (int i = 0; i < wavelengths.size(); ++i) {
+    intensities[i] = intensity;
+  }
 }
 
 spectral_distribution::spectral_distribution(const char *file_path) {
@@ -138,7 +146,7 @@ spectral_distribution spectral_distribution::operator/(const double t) const {
   return distribution;
 }
 
-// 読み込みのテスト
+// 事前に読み込み
 const auto x_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_xbar.csv");
 const auto y_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_ybar.csv");
 const auto z_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_zbar.csv");
@@ -150,4 +158,31 @@ const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv"
 const auto wavelength_sample_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
 double sample_factor = 472 / (integral_y * wavelength_sample_size);
+
+color inline getXYZFromWavelength(size_t lambda) {
+  auto index = lambda - x_bar.get_index_wavelength();
+  color xyz(x_bar.get_intensity(index), y_bar.get_intensity(index), z_bar.get_intensity(index));
+  return xyz;
+}
+
+color inline spectralToRgb(const spectral_distribution &distribution) {
+  double X = 0, Y = 0, Z = 0;
+  size_t wavelength_size = distribution.size();
+  for (size_t index = 0; index < wavelength_size; ++index) {
+    size_t lambda = distribution.get_wavelength(index);
+    color xyz = getXYZFromWavelength(lambda);
+    X += distribution.get_intensity(index) * xyz.x() * sample_factor;
+    Y += distribution.get_intensity(index) * xyz.y() * sample_factor;
+    Z += distribution.get_intensity(index) * xyz.z() * sample_factor;
+  }
+  vec3 XYZ{X, Y, Z};
+  /// srgb_d65
+  return {dot(srgb_d65_vec0, XYZ), dot(srgb_d65_vec1, XYZ), dot(srgb_d65_vec2, XYZ)};
+}
+
+static auto MACBETH_BLUE = spectralToRgb(blue_spectra);
+static auto MACBETH_RED = spectralToRgb(red_spectra);
+static auto MACBETH_WHITE = spectralToRgb(white_spectra);
+static auto MACBETH_BLACK = spectralToRgb(black_spectra);
+static auto D65_LIGHT = spectralToRgb(d65_spectra);
 #endif //RTCAMP2022_SRC_UTILS_SPECTRAL_DISTRIBUTION_H_

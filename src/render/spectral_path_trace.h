@@ -48,25 +48,4 @@ spectral_distribution inline spectral_path_trace(const ray &r,
   return emitted + s_s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val;
 }
 
-color inline getXYZFromWavelength(size_t lambda) {
-  auto index = lambda - x_bar.get_index_wavelength();
-  color xyz(x_bar.get_intensity(index), y_bar.get_intensity(index), z_bar.get_intensity(index));
-  return xyz;
-}
-
-color inline spectralToRgb(const spectral_distribution &distribution) {
-  double X = 0, Y = 0, Z = 0;
-  size_t wavelength_size = distribution.size();
-  for (size_t index = 0; index < wavelength_size; ++index) {
-    size_t lambda = distribution.get_wavelength(index);
-    color xyz = getXYZFromWavelength(lambda);
-    X += distribution.get_intensity(index) * xyz.x() * sample_factor;
-    Y += distribution.get_intensity(index) * xyz.y() * sample_factor;
-    Z += distribution.get_intensity(index) * xyz.z() * sample_factor;
-  }
-  vec3 XYZ{X, Y, Z};
-  /// srgb_d65
-  return {dot(srgb_d65_vec0, XYZ), dot(srgb_d65_vec1, XYZ), dot(srgb_d65_vec2, XYZ)};
-}
-
 #endif //RTCAMP2022_SRC_RENDER_SPECTRAL_PATH_TRACE_H_

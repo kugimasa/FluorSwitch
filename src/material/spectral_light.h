@@ -18,7 +18,7 @@ class spectral_diffuse_light : public spectral_material {
     if (rec.front_face) {
       return emit;
     } else {
-      return black_spectra;
+      return zero_spectra;
     }
   }
  public:

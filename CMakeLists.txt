@@ -8,6 +8,22 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(rtcamp2022
                src/main.cpp
+               src/camera/camera.h
+               src/material/material.h
+               src/material/light.h
+               src/material/spectral_material.h
+               src/material/spectral_light.h
+               src/objects/aarect.h
+               src/objects/box.h
+               src/objects/constant_medium.h
+               src/objects/cornell_box.h
+               src/objects/geometry.h
+               src/objects/sphere.h
+               src/objects/triangle.h
+               src/render/path_trace.h
+               src/render/spectral_path_trace.h
+               src/sampling/pdf.h
+               src/scene/scene.h
                src/utils/hittable.h
                src/utils/hittable_list.h
                src/utils/ray.h
@@ -22,22 +38,7 @@ add_executable(rtcamp2022
                src/utils/rtw_stb_image.h
                src/utils/spectral_distribution.h
                src/utils/texture.h
-               src/utils/util_funcs.h
-               src/camera/camera.h
-               src/objects/aarect.h
-               src/objects/box.h
-               src/objects/constant_medium.h
-               src/objects/cornell_box.h
-               src/objects/geometry.h
-               src/objects/sphere.h
-               src/objects/triangle.h
-               src/sampling/pdf.h
-               src/material/material.h
-               src/material/light.h
-               src/material/spectral_material.h
-               src/material/spectral_light.h
-               src/render/path_trace.h
-               src/render/spectral_path_trace.h)
+               src/utils/util_funcs.h)
 
 include_directories("external/stb")
 include_directories("external/tinyobjloader")
