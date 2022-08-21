@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_executable(rtcamp2022
                src/main.cpp
                src/camera/camera.h
+               src/material/fluorescent_material.h
                src/material/material.h
                src/material/light.h
                src/material/spectral_material.h

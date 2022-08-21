@@ -99,7 +99,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 25;
+  int ns = 150;
   std::cout << "PPS: " << ns << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
@@ -162,9 +162,10 @@ void execute() {
 
 int main() {
   // 実行開始
-  std::thread timer(program_timer);
+  /// TODO: 一旦タイマー外し
+  // std::thread timer(program_timer);
   std::thread exec(execute);
-  timer.join();
+  // timer.join();
   exec.join();
   return 0;
 }

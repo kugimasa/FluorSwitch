@@ -7,8 +7,6 @@
 #include "../utils/spectral_distribution.h"
 
 struct spectral_scattered_record {
-  ray specular_ray;
-  bool is_specular;
   spectral_distribution attenuation;
   shared_ptr<pdf> pdf_ptr;
 };
@@ -37,7 +35,6 @@ class spectral_lambertian : public spectral_material {
   spectral_lambertian(spectral_distribution a) : albedo(a) {}
 
   virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, spectral_scattered_record &s_rec) const {
-    s_rec.is_specular = false;
     s_rec.attenuation = albedo;
     s_rec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
     return true;

@@ -37,9 +37,6 @@ color inline path_trace(const ray &r,
     return s_rec.attenuation * path_trace(s_rec.specular_ray, background, world, lights, depth - 1);
   }
 
-  /// TODO: 蛍光実装する場合はここで分岐??
-  /// if(s_rec.is_fluor) {}
-
   auto light_pdf = make_shared<hittable_pdf<material>>(lights, rec.p);
   mixture_pdf mixture_pdf(light_pdf, s_rec.pdf_ptr);
 

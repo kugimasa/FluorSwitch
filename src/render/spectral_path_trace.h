@@ -16,8 +16,7 @@ spectral_distribution inline spectral_path_trace(const ray &r,
 
   /// レイの最大反射後
   if (depth <= 0) {
-    // TODO: BLACK
-    return black_spectra;
+    return spectral_distribution{black_spectra, 0.0};
   }
 
   /// 背景色
@@ -32,9 +31,6 @@ spectral_distribution inline spectral_path_trace(const ray &r,
   /// 光源にヒットした場合
   if (!rec.mat_ptr->scatter(r, rec, s_s_rec))
     return emitted;
-
-  /// TODO: 蛍光実装する場合はここで分岐??
-  /// if(s_rec.is_fluor) {}
 
   auto light_pdf = make_shared<hittable_pdf<spectral_material>>(lights, rec.p);
   mixture_pdf mixture_pdf(light_pdf, s_s_rec.pdf_ptr);

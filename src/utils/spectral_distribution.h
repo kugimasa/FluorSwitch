@@ -155,6 +155,7 @@ const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_mode
 const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
 const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
 const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
+const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv");
 const auto wavelength_sample_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
 double sample_factor = 472 / (integral_y * wavelength_sample_size);
