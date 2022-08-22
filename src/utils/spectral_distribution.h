@@ -1,6 +1,8 @@
 #ifndef RTCAMP2022_SRC_UTILS_SPECTRAL_DISTRIBUTION_H_
 #define RTCAMP2022_SRC_UTILS_SPECTRAL_DISTRIBUTION_H_
-
+#include <algorithm>
+#include <numeric>
+#include <random>
 #include "csv.h"
 
 const vec3 srgb_d65_vec0{3.2404542, -1.5371385, -0.4985314};
@@ -11,6 +13,7 @@ class spectral_distribution {
  public:
   spectral_distribution() {}
   spectral_distribution(const spectral_distribution &distribution);
+  spectral_distribution(const spectral_distribution &distribution, std::vector<size_t> sample_indices);
   spectral_distribution(const spectral_distribution &distribution, const double intensity);
   spectral_distribution(const char *file_path);
 
@@ -59,6 +62,18 @@ spectral_distribution::spectral_distribution(const spectral_distribution &distri
   }
   wavelengths = distribution.wavelengths;
   intensities = distribution.intensities;
+}
+
+spectral_distribution::spectral_distribution(const spectral_distribution &distribution, std::vector<size_t> sample_indices) {
+  std::vector<size_t> _wavelengths;
+  std::vector<double> _intensities;
+  for (size_t index = 0; index != sample_indices.size(); ++index) {
+    _wavelengths.push_back(distribution.get_wavelength(sample_indices.at(index)));
+    _intensities.push_back(distribution.get_intensity(sample_indices.at(index)));
+  }
+  index_wavelength = _wavelengths[0];
+  wavelengths = _wavelengths;
+  intensities = _intensities;
 }
 
 spectral_distribution::spectral_distribution(const spectral_distribution &distribution, const double intensity) {
@@ -146,6 +161,16 @@ spectral_distribution spectral_distribution::operator/(const double t) const {
   return distribution;
 }
 
+/// 一様サンプル
+inline std::vector<size_t> random_sample_wavelengths(size_t full_size, size_t sample_size) {
+  std::vector<size_t> indices(full_size), out;
+  std::iota(indices.begin(), indices.end(), 0);
+  std::sample(indices.begin(), indices.end(), std::back_inserter(out), sample_size, std::mt19937{std::random_device{}()});
+  // 昇順ソート
+  std::sort(out.begin(), out.end());
+  return out;
+}
+
 // 事前に読み込み
 const auto x_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_xbar.csv");
 const auto y_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_ybar.csv");
@@ -158,7 +183,9 @@ const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv"
 const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv");
 const auto wavelength_sample_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
-double sample_factor = 472 / (integral_y * wavelength_sample_size);
+const double sample_factor = x_bar.size() / (integral_y * wavelength_sample_size);
+#define WAVELENGTH_SAMPLE_SIZE 16
+const auto sample_indices_k = random_sample_wavelengths(wavelength_sample_size, WAVELENGTH_SAMPLE_SIZE);
 
 color inline getXYZFromWavelength(size_t lambda) {
   auto index = lambda - x_bar.get_index_wavelength();

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 project(rtcamp2022 VERSION 0.1.0 LANGUAGES C CXX)
 message(STATUS "rtcamp2022🏕 version: ${PROJECT_VERSION}")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 add_executable(rtcamp2022
                src/main.cpp

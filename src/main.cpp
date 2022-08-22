@@ -98,8 +98,9 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 150;
+  int ns = 25;
   std::cout << "PPS: " << ns << std::endl;
+  std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
   /// BitMap
