@@ -183,8 +183,8 @@ const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv"
 const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv");
 const auto wavelength_sample_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
-const double sample_factor = x_bar.size() / (integral_y * wavelength_sample_size);
 #define WAVELENGTH_SAMPLE_SIZE 16
+const double sample_factor = x_bar.size() / (integral_y * WAVELENGTH_SAMPLE_SIZE);
 const auto sample_indices_k = random_sample_wavelengths(wavelength_sample_size, WAVELENGTH_SAMPLE_SIZE);
 
 color inline getXYZFromWavelength(size_t lambda) {
