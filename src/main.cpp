@@ -75,20 +75,19 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
 
   for (int j = 0; j < ny; ++j) {
     for (int i = 0; i < nx; ++i) {
-      vec3 col(0, 0, 0);
+      spectral_distribution spectra(black_spectra, 0.0);
       for (int s = 0; s < ns; ++s) {
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
         // col += path_trace(r, background, world, lights, max_depth);
-        auto spectra(spectral_path_trace(r, background, world, lights, max_depth));
-        col += spectralToRgb(spectra);
+        spectra = spectra + spectral_path_trace(r, background, world, lights, max_depth);
       }
 #ifndef NDEBUG
       progress = double(i + j * nx) / img_size;
       flush_progress(progress);
 #endif
-      drawPix(data, nx, ny, i, j, col, ns);
+      drawPix(data, nx, ny, i, j, spectralToRgb(spectra), ns);
     }
   }
 }
