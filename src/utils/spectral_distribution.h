@@ -171,6 +171,13 @@ inline std::vector<size_t> random_sample_wavelengths(size_t full_size, size_t sa
   return out;
 }
 
+/// 波長を考慮したサンプル
+inline std::vector<size_t> importance_sample_wavelengths(size_t full_size, size_t sample_size) {
+  std::vector<size_t> indices(full_size), out;
+  /// TODO: 波長をインポータンスサンプル
+  return out;
+}
+
 // 事前に読み込み
 const auto x_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_xbar.csv");
 const auto y_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_ybar.csv");
@@ -180,7 +187,7 @@ const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_mode
 const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
 const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
 const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
-const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv");
+const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv") * 100;
 const auto zero_spectra = spectral_distribution(black_spectra, 0.0);
 const auto wavelength_sample_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()

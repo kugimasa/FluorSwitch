@@ -16,7 +16,7 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   auto red = spectral_distribution(red_spectra, sample_indices_k);
   auto white = spectral_distribution(white_spectra, sample_indices_k);
   auto black = spectral_distribution(black_spectra, sample_indices_k);
-  auto light = spectral_distribution(d65_spectra, sample_indices_k);
+  auto light = spectral_distribution(uv_spectra, sample_indices_k);
 
   /// マテリアル設定
   auto blue_mat = make_shared<spectral_lambertian>(blue);
@@ -24,6 +24,7 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   auto white_mat = make_shared<spectral_lambertian>(white);
   auto black_mat = make_shared<spectral_lambertian>(black);
   auto light_mat = make_shared<spectral_diffuse_light>(light);
+  auto fluo_mat = make_shared<fluorescent_material>(black);
   /// コーネルボックス
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list<spectral_material>>(cb));
@@ -31,11 +32,11 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   double f = (double) frame / (max_frame * 2);
   double offset = 50;
   double radius = 90 + sin(f * 2 * M_PI) * offset;
-  world.add(make_shared<sphere<spectral_material>>(vec3(radius + 100, 90, radius + 100), radius, black_mat));
+  world.add(make_shared<sphere<spectral_material>>(vec3(radius + 100, 90, radius + 100), radius, fluo_mat));
   return world;
 }
 
-inline shared_ptr<hittable_list<spectral_material>> construct_spectral_light_sampler() {
+inline shared_ptr<hittable_list<spectral_material>> construct_spectral_light_sampler(int frame, int max_frame) {
   auto lights = make_shared<hittable_list<spectral_material>>();
   /// 光源サンプル用
   lights->add(make_shared<xz_rect<spectral_material>>(202.5, 352.5, 202.5, 352.5, 554, shared_ptr<spectral_material>()));

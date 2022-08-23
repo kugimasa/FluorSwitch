@@ -135,7 +135,7 @@ void execute() {
     memset(output.data, 0xFF, output.width * output.height * output.ch);
     /// シーンデータ
     auto world = construct_spectral_scene(frame, MAX_FRAME);
-    auto lights = construct_spectral_light_sampler();
+    auto lights = construct_spectral_light_sampler(frame, MAX_FRAME);
     /// 描画処理
     render(output.data, nx, ny, ns, background_spectra, world, lights, frame);
 

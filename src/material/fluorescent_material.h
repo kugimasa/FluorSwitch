@@ -8,18 +8,12 @@ class fluorescent_material : public spectral_material {
   fluorescent_material(spectral_distribution a) : albedo(a) {}
 
   virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, spectral_scattered_record &s_rec) const {
-    s_rec.attenuation = albedo + (emission * excitation * eta);
+    s_rec.is_fluor = true;
+    s_rec.attenuation = albedo;
+    s_rec.excitation = sample_excitation;
+    s_rec.emission = sample_emission * eta;
     s_rec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
     return true;
-  }
-
-  virtual spectral_distribution emitted(const ray &r_in, const hit_record<spectral_material> &rec, double u, double v, const point3 &p) const {
-    // 外側に発光
-    if (rec.front_face) {
-      return emission;
-    } else {
-      return zero_spectra;
-    }
   }
 
   double scattering_pdf(const ray &r_in, const hit_record<spectral_material> &rec, const ray &scattered) const {
@@ -30,7 +24,9 @@ class fluorescent_material : public spectral_material {
   double eta = 0.02;
   spectral_distribution albedo;
   spectral_distribution excitation = spectral_distribution("./assets/spectra/fluor/qdot545in.csv");
-  spectral_distribution emission = spectral_distribution("./assets/spectra/fluor/qdot545out.csv");;
+  spectral_distribution emission = spectral_distribution("./assets/spectra/fluor/qdot545out.csv");
+  spectral_distribution sample_excitation = spectral_distribution(excitation, sample_indices_k);
+  spectral_distribution sample_emission = spectral_distribution(emission, sample_indices_k);
 };
 
 #endif //RTCAMP2022_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_
