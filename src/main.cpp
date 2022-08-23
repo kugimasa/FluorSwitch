@@ -75,7 +75,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
 
   for (int j = 0; j < ny; ++j) {
     for (int i = 0; i < nx; ++i) {
-      spectral_distribution spectra(black_spectra, 0.0);
+      spectral_distribution spectra{zero_sample_spectra};
       for (int s = 0; s < ns; ++s) {
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
@@ -115,7 +115,7 @@ void execute() {
 #endif
 
   /// シーン背景
-  spectral_distribution background_spectra{black_spectra, 0.0};
+  spectral_distribution background_spectra{zero_sample_spectra};
   color background_rgb = BLACK;
 
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {

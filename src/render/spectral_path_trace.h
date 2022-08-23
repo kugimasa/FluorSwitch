@@ -16,7 +16,7 @@ spectral_distribution inline spectral_path_trace(const ray &r,
 
   /// レイの最大反射後
   if (depth <= 0) {
-    return spectral_distribution{black_spectra, 0.0};
+    return zero_sample_spectra;
   }
 
   /// 背景色
