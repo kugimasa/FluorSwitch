@@ -72,11 +72,12 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
   double progress{0.0};
   int img_size = nx * ny;
+  spectral_distribution spectra{zero_sample_spectra};
 
   for (int j = 0; j < ny; ++j) {
     for (int i = 0; i < nx; ++i) {
-      spectral_distribution spectra{zero_sample_spectra};
       for (int s = 0; s < ns; ++s) {
+        spectra = zero_sample_spectra;
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
