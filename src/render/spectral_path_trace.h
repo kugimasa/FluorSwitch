@@ -44,8 +44,8 @@ spectral_distribution inline spectral_path_trace(const ray &r,
 
   /// 蛍光の場合
   if (s_s_rec.is_fluor) {
-    auto K = s_s_rec.excitation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val;
-    return emitted + reflectance_spectra + s_s_rec.emission * K.sum();
+    auto K = s_s_rec.excitation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val * inv_wave_pdf_val;
+    return emitted + reflectance_spectra + s_s_rec.emission * K.sum() / WAVELENGTH_SAMPLE_SIZE;
   }
 
   /// 再起処理

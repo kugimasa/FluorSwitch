@@ -187,12 +187,13 @@ const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_mode
 const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
 const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
 const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
-const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv") * 100;
+const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv") * 500;
 const auto zero_spectra = spectral_distribution(black_spectra, 0.0);
 const auto wavelength_sample_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
 #define WAVELENGTH_SAMPLE_SIZE 16
-const double sample_factor = x_bar.size() / (integral_y * WAVELENGTH_SAMPLE_SIZE);
+const double inv_wave_pdf_val = (double) x_bar.size() / WAVELENGTH_SAMPLE_SIZE;
+const double sample_factor = inv_wave_pdf_val / integral_y;
 const auto sample_indices_k = random_sample_wavelengths(wavelength_sample_size, WAVELENGTH_SAMPLE_SIZE);
 const auto zero_sample_spectra = spectral_distribution(zero_spectra, sample_indices_k);
 

@@ -21,7 +21,7 @@ class fluorescent_material : public spectral_material {
     return cos < 0 ? 0 : cos * M_1_PI;
   }
 
-  double eta = 0.02;
+  double eta = 1.0;
   spectral_distribution albedo;
   spectral_distribution excitation = spectral_distribution("./assets/spectra/fluor/qdot545in.csv");
   spectral_distribution emission = spectral_distribution("./assets/spectra/fluor/qdot545out.csv");
