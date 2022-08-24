@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <chrono>
 #include <thread>
+#include <omp.h>
 #include "camera/camera.h"
 #include "material/material.h"
 #include "material/light.h"
@@ -74,6 +75,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   int img_size = nx * ny;
   spectral_distribution spectra{zero_sample_spectra};
 
+  #pragma omp parallel for private(spectra) schedule(dynamic, 1)
   for (int j = 0; j < ny; ++j) {
     for (int i = 0; i < nx; ++i) {
       for (int s = 0; s < ns; ++s) {
@@ -81,12 +83,14 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
-        // col += path_trace(r, background, world, lights, max_depth);
         spectra = spectra + spectral_path_trace(r, background, world, lights, max_depth);
+        // col += path_trace(r, background, world, lights, max_depth);
       }
 #ifndef NDEBUG
+#ifndef _OPENMP
       progress = double(i + j * nx) / img_size;
       flush_progress(progress);
+#endif
 #endif
       drawPix(data, nx, ny, i, j, spectralToRgb(spectra), ns);
     }
@@ -102,6 +106,7 @@ void execute() {
   int ns = 25;
   std::cout << "PPS: " << ns << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
+  std::cout << "OpenMP threads: " << omp_get_max_threads() << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
   /// BitMap
@@ -163,10 +168,9 @@ void execute() {
 
 int main() {
   // 実行開始
-  /// TODO: 一旦タイマー外し
-  // std::thread timer(program_timer);
+  std::thread timer(program_timer);
   std::thread exec(execute);
-  // timer.join();
+  timer.join();
   exec.join();
   return 0;
 }
