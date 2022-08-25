@@ -125,10 +125,10 @@ void execute() {
   color background_rgb = BLACK;
 
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {
-#ifndef NDEBUG
+//#ifndef NDEBUG
     // 時間計測開始
     start = std::chrono::system_clock::now();
-#endif
+//#endif
     /// Malloc
     output.data = (unsigned char *) malloc(sizeof(unsigned char) * output.width * output.height * output.ch);
     if (output.data == NULL) {
@@ -154,13 +154,13 @@ void execute() {
     }
 
     freeBitmapData(&output);
-#ifndef NDEBUG
+//#ifndef NDEBUG
     // 時間計測終了
     end = std::chrono::system_clock::now();
     // 経過時間の算出
     double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     std::cout << "\n[" << sout.str() << "]: " << elapsed * 0.001 << "(sec)s" << std::endl;
-#endif
+//#endif
   }
   std::cout << "\n========== Finish ==========" << std::endl;
   exit(0);
