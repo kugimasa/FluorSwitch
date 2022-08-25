@@ -25,6 +25,11 @@
 #include "utils/my_print.h"
 #include "utils/bvh.h"
 
+// 30fps * 5 sec
+#define MAX_FRAME 1
+#define MAX_THREAD_NUM 8
+#define CHANNEL_NUM 3
+
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
              unsigned int x, unsigned int y,
@@ -54,8 +59,6 @@ void drawPix(unsigned char *data,
   p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
 }
 
-// 30fps * 5 sec
-#define MAX_FRAME 1
 template<typename color_type, typename mat>
 void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
             color_type background, hittable_list<mat> world, shared_ptr<hittable_list<mat>> &lights,
@@ -75,7 +78,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   int img_size = nx * ny;
   spectral_distribution spectra{zero_sample_spectra};
 
-  #pragma omp parallel for private(spectra) schedule(dynamic, 1)
+  #pragma omp parallel for private(spectra) schedule(dynamic, 1) num_threads(MAX_THREAD_NUM)
   for (int j = 0; j < ny; ++j) {
     for (int i = 0; i < nx; ++i) {
       for (int s = 0; s < ns; ++s) {
@@ -97,8 +100,6 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   }
 }
 
-#define CHANNEL_NUM 3
-
 // メインの処理
 void execute() {
   int nx = 600;
@@ -106,7 +107,7 @@ void execute() {
   int ns = 25;
   std::cout << "PPS: " << ns << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
-  std::cout << "OpenMP threads: " << omp_get_max_threads() << std::endl;
+  std::cout << "OpenMP threads: " << MAX_THREAD_NUM << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
   /// BitMap
