@@ -24,6 +24,7 @@ add_executable(rtcamp2022
                src/render/path_trace.h
                src/render/spectral_path_trace.h
                src/sampling/pdf.h
+               src/sampling/spectral_pdf.h
                src/scene/scene.h
                src/utils/hittable.h
                src/utils/hittable_list.h

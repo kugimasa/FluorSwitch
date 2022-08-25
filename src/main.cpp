@@ -24,6 +24,7 @@
 #include "utils/spectral_distribution.h"
 #include "utils/my_print.h"
 #include "utils/bvh.h"
+#include "sampling/spectral_pdf.h"
 
 // 30fps * 5 sec
 #define MAX_FRAME 1
@@ -33,24 +34,11 @@
 void drawPix(unsigned char *data,
              unsigned int w, unsigned int h,
              unsigned int x, unsigned int y,
-             const color pix_color,
-             int samples_per_pixel) {
+             const color pix_color) {
 
   auto r = pix_color.x();
   auto g = pix_color.y();
   auto b = pix_color.z();
-
-  // NaNを除外
-  // NaN同士の比較は成り立たない
-  if (r != r) r = 0.0;
-  if (b != b) b = 0.0;
-  if (g != g) g = 0.0;
-
-  // サンプル数の平均 + ガンマ補正(gamma=2.0)
-  auto scale = 1.0 / samples_per_pixel;
-  r = sqrt(scale * r);
-  g = sqrt(scale * g);
-  b = sqrt(scale * b);
 
   unsigned char *p;
   p = data + (h - y - 1) * w * 3 + x * 3;
@@ -70,19 +58,19 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   double vfov{40.0};
   double dist_to_focus{10.0};
   double aperture{0.0};
-  int max_depth = 50;
+  int max_depth = 8;
   double aspect = double(nx) / double(ny);
   double t0{0.0}, t1{1.0};
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
   double progress{0.0};
   int img_size = nx * ny;
-  spectral_distribution spectra{zero_sample_spectra};
+  spectral_distribution spectra{background, 0.0};
 
   #pragma omp parallel for private(spectra) schedule(dynamic, 1) num_threads(MAX_THREAD_NUM)
   for (int j = 0; j < ny; ++j) {
     for (int i = 0; i < nx; ++i) {
       for (int s = 0; s < ns; ++s) {
-        spectra = zero_sample_spectra;
+        spectra = background;
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = cam.get_ray(u, v);
@@ -95,7 +83,27 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
       flush_progress(progress);
 #endif
 #endif
-      drawPix(data, nx, ny, i, j, spectralToRgb(spectra), ns);
+
+      auto col = spectralToRgb(spectra / ns);
+
+      /// TODO: 関数化
+      auto r = col.x();
+      auto g = col.y();
+      auto b = col.z();
+
+      // NaNを除外
+      // NaN同士の比較は成り立たない
+      if (r != r) r = 0.0;
+      if (b != b) b = 0.0;
+      if (g != g) g = 0.0;
+
+      // サンプル数の平均 + ガンマ補正(gamma=2.0
+      r = sqrt(r);
+      g = sqrt(g);
+      b = sqrt(b);
+
+      col = color(r, g, b);
+      drawPix(data, nx, ny, i, j, col);
     }
   }
 }
@@ -104,7 +112,7 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 25;
+  int ns = 15;
   std::cout << "PPS: " << ns << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
   std::cout << "OpenMP threads: " << MAX_THREAD_NUM << std::endl;
@@ -121,10 +129,6 @@ void execute() {
   std::chrono::system_clock::time_point start, end;
 //#endif
 
-  /// シーン背景
-  spectral_distribution background_spectra{zero_sample_spectra};
-  color background_rgb = BLACK;
-
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {
 //#ifndef NDEBUG
     // 時間計測開始
@@ -140,8 +144,13 @@ void execute() {
     /// 背景色の指定
     memset(output.data, 0xFF, output.width * output.height * output.ch);
     /// シーンデータ
-    auto world = construct_spectral_scene(frame, MAX_FRAME);
+    auto sample_wavelength = random_sample_wavelengths(full_wavelength_size, WAVELENGTH_SAMPLE_SIZE);
+    auto world = construct_spectral_scene(frame, MAX_FRAME, sample_wavelength);
     auto lights = construct_spectral_light_sampler(frame, MAX_FRAME);
+    /// シーン背景
+    auto background_spectra = spectral_distribution(zero_spectra, sample_wavelength);
+    color background_rgb = BLACK;
+
     /// 描画処理
     render(output.data, nx, ny, ns, background_spectra, world, lights, frame);
 

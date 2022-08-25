@@ -10,13 +10,13 @@
 #include "../utils/hittable_list.h"
 #include "../utils/bvh.h"
 
-inline hittable_list<spectral_material> construct_spectral_scene(int frame, int max_frame) {
+inline hittable_list<spectral_material> construct_spectral_scene(int frame, int max_frame, std::vector<size_t> wavelength_indices) {
   hittable_list<spectral_material> world;
-  auto blue = spectral_distribution(blue_spectra, sample_indices_k);
-  auto red = spectral_distribution(red_spectra, sample_indices_k);
-  auto white = spectral_distribution(white_spectra, sample_indices_k);
-  auto black = spectral_distribution(black_spectra, sample_indices_k);
-  auto light = spectral_distribution(uv_spectra, sample_indices_k);
+  auto blue = spectral_distribution(blue_spectra, wavelength_indices);
+  auto red = spectral_distribution(red_spectra, wavelength_indices);
+  auto white = spectral_distribution(white_spectra, wavelength_indices);
+  auto black = spectral_distribution(black_spectra, wavelength_indices);
+  auto light = spectral_distribution(uv_spectra, wavelength_indices);
 
   /// マテリアル設定
   auto blue_mat = make_shared<spectral_lambertian>(blue);
@@ -24,7 +24,8 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   auto white_mat = make_shared<spectral_lambertian>(white);
   auto black_mat = make_shared<spectral_lambertian>(black);
   auto light_mat = make_shared<spectral_diffuse_light>(light);
-  auto fluo_mat = make_shared<fluorescent_material>(black);
+  // NEED FIX
+  auto fluo_mat = make_shared<fluorescent_material>(black, wavelength_indices);
   /// コーネルボックス
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list<spectral_material>>(cb));

@@ -1,8 +1,5 @@
 #ifndef RTCAMP2022_SRC_UTILS_SPECTRAL_DISTRIBUTION_H_
 #define RTCAMP2022_SRC_UTILS_SPECTRAL_DISTRIBUTION_H_
-#include <algorithm>
-#include <numeric>
-#include <random>
 #include "csv.h"
 
 const vec3 srgb_d65_vec0{3.2404542, -1.5371385, -0.4985314};
@@ -161,23 +158,6 @@ spectral_distribution spectral_distribution::operator/(const double t) const {
   return distribution;
 }
 
-/// 一様サンプル
-inline std::vector<size_t> random_sample_wavelengths(size_t full_size, size_t sample_size) {
-  std::vector<size_t> indices(full_size), out;
-  std::iota(indices.begin(), indices.end(), 0);
-  std::sample(indices.begin(), indices.end(), std::back_inserter(out), sample_size, std::mt19937{std::random_device{}()});
-  // 昇順ソート
-  std::sort(out.begin(), out.end());
-  return out;
-}
-
-/// 波長を考慮したサンプル
-inline std::vector<size_t> importance_sample_wavelengths(size_t full_size, size_t sample_size) {
-  std::vector<size_t> indices(full_size), out;
-  /// TODO: 波長をインポータンスサンプル
-  return out;
-}
-
 // 事前に読み込み
 const auto x_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_xbar.csv");
 const auto y_bar = spectral_distribution("./assets/spectra/xyz/cie_sco_2degree_ybar.csv");
@@ -188,14 +168,14 @@ const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_wh
 const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
 const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
 const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv") * 500;
+const auto excitation_spectra = spectral_distribution("./assets/spectra/fluor/qdot545in.csv");
+const auto emission_spectra = spectral_distribution("./assets/spectra/fluor/qdot545out.csv");
 const auto zero_spectra = spectral_distribution(black_spectra, 0.0);
-const auto wavelength_sample_size = d65_spectra.size();
+const auto full_wavelength_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
 #define WAVELENGTH_SAMPLE_SIZE 16
 const double inv_wave_pdf_val = (double) x_bar.size() / WAVELENGTH_SAMPLE_SIZE;
 const double sample_factor = inv_wave_pdf_val / integral_y;
-const auto sample_indices_k = random_sample_wavelengths(wavelength_sample_size, WAVELENGTH_SAMPLE_SIZE);
-const auto zero_sample_spectra = spectral_distribution(zero_spectra, sample_indices_k);
 
 color inline getXYZFromWavelength(size_t lambda) {
   auto index = lambda - x_bar.get_index_wavelength();

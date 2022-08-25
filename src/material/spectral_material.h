@@ -25,7 +25,7 @@ class spectral_material {
   }
 
   virtual spectral_distribution emitted(const ray &r_in, const hit_record<spectral_material> &rec, double u, double v, const point3 &p) const {
-    return zero_sample_spectra;
+    return zero_spectra;
   };
 };
 
@@ -39,6 +39,10 @@ class spectral_lambertian : public spectral_material {
     s_rec.attenuation = albedo;
     s_rec.pdf_ptr = make_shared<cosine_pdf>(rec.normal);
     return true;
+  }
+
+  virtual spectral_distribution emitted(const ray &r_in, const hit_record<spectral_material> &rec, double u, double v, const point3 &p) const {
+    return zero_spectra;
   }
 
   double scattering_pdf(const ray &r_in, const hit_record<spectral_material> &rec, const ray &scattered) const {
