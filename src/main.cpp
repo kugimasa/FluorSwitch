@@ -115,10 +115,10 @@ void execute() {
   output.height = ny;
   output.ch = 3;
 
-#ifndef NDEBUG
+//#ifndef NDEBUG
   // chrono変数
   std::chrono::system_clock::time_point start, end;
-#endif
+//#endif
 
   /// シーン背景
   spectral_distribution background_spectra{zero_sample_spectra};
