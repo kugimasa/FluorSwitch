@@ -10,7 +10,7 @@ class spectral_distribution {
  public:
   spectral_distribution() {}
   spectral_distribution(const spectral_distribution &distribution);
-  spectral_distribution(const spectral_distribution &distribution, std::vector<size_t> sample_indices);
+  spectral_distribution(const spectral_distribution &distribution, std::vector<size_t> &sample_indices);
   spectral_distribution(const spectral_distribution &distribution, const double intensity);
   spectral_distribution(const char *file_path);
 
@@ -38,6 +38,19 @@ class spectral_distribution {
     return sum;
   }
 
+  inline spectral_distribution calc_cdf() {
+    spectral_distribution cdf;
+    cdf.intensities = intensities;
+    cdf.wavelengths = wavelengths;
+    cdf.index_wavelength = index_wavelength;
+    double sum = 0;
+    for (int i = 0; i < wavelengths.size(); ++i) {
+      sum += intensities[i];
+      cdf.intensities[i] = sum;
+    }
+    return cdf / sum;
+  }
+
   inline spectral_distribution operator+(const spectral_distribution &other) const;
   inline spectral_distribution operator+(double t) const;
   inline spectral_distribution operator-(const spectral_distribution &other) const;
@@ -61,7 +74,7 @@ spectral_distribution::spectral_distribution(const spectral_distribution &distri
   intensities = distribution.intensities;
 }
 
-spectral_distribution::spectral_distribution(const spectral_distribution &distribution, std::vector<size_t> sample_indices) {
+spectral_distribution::spectral_distribution(const spectral_distribution &distribution, std::vector<size_t> &sample_indices) {
   std::vector<size_t> _wavelengths;
   std::vector<double> _intensities;
   for (size_t index = 0; index != sample_indices.size(); ++index) {

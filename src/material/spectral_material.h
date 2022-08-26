@@ -32,7 +32,7 @@ class spectral_material {
 /// 拡散反射面
 class spectral_lambertian : public spectral_material {
  public:
-  spectral_lambertian(spectral_distribution a) : albedo(a) {}
+  spectral_lambertian(const spectral_distribution &a) : albedo(a) {}
 
   virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, spectral_scattered_record &s_rec) const {
     s_rec.is_fluor = false;

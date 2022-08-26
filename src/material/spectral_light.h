@@ -7,7 +7,7 @@
 
 class spectral_diffuse_light : public spectral_material {
  public:
-  spectral_diffuse_light(spectral_distribution c) : emit(c) {}
+  spectral_diffuse_light(const spectral_distribution &c) : emit(c) {}
 
   virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, color &attenuation, ray &scattered) const {
     return false;

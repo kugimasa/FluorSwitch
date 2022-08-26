@@ -5,7 +5,7 @@
 /// 拡散反射面
 class fluorescent_material : public spectral_material {
  public:
-  fluorescent_material(spectral_distribution a, std::vector<size_t> sample_indices) {
+  fluorescent_material(const spectral_distribution &a, std::vector<size_t> &sample_indices) {
     albedo = a;
     sample_excitation = spectral_distribution(excitation_spectra, sample_indices);
     sample_emission = spectral_distribution(emission_spectra, sample_indices);
