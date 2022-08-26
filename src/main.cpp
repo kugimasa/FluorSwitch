@@ -62,8 +62,6 @@ void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   double aspect = double(nx) / double(ny);
   double t0{0.0}, t1{1.0};
   camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
-  double progress{0.0};
-  int img_size = nx * ny;
   spectral_distribution spectra{background, 0.0};
 
   #pragma omp parallel for private(spectra) schedule(dynamic, 1) num_threads(MAX_THREAD_NUM)

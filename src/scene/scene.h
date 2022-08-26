@@ -9,6 +9,22 @@
 #include "../objects/geometry.h"
 #include "../utils/hittable_list.h"
 #include "../utils/bvh.h"
+#include "../sampling/spectral_pdf.h"
+
+#define SPHERE_RADIUS 75
+#define LIGHT_WIDTH 150
+
+inline spectral_distribution calc_fluorescent_pdf() {
+  double inv_k_f = 1 / emission_spectra.sum();
+  double w_f = 4 * M_PI * SPHERE_RADIUS * SPHERE_RADIUS * inv_k_f;
+  return emission_spectra * w_f;
+}
+
+inline spectral_distribution calc_light_pdf() {
+  double inv_k_l = 1 / uv_spectra.sum();
+  double w_l = LIGHT_WIDTH * LIGHT_WIDTH * inv_k_l;
+  return uv_spectra * w_l;
+}
 
 inline hittable_list<spectral_material> construct_spectral_scene(int frame, int max_frame, std::vector<size_t> wavelength_indices) {
   hittable_list<spectral_material> world;
@@ -29,11 +45,8 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   /// コーネルボックス
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list<spectral_material>>(cb));
-  /// 拡大縮小/移動する球
-  double f = (double) frame / (max_frame * 2);
-  double offset = 50;
-  double radius = 90 + sin(f * 2 * M_PI) * offset;
-  world.add(make_shared<sphere<spectral_material>>(vec3(radius + 100, 90, radius + 100), radius, fluo_mat));
+  /// 移動する球
+  world.add(make_shared<sphere<spectral_material>>(vec3(227.5, 90, 150), SPHERE_RADIUS, fluo_mat));
   return world;
 }
 

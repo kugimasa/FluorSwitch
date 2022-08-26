@@ -11,6 +11,12 @@ class fluorescent_material : public spectral_material {
     sample_emission = spectral_distribution(emission_spectra, sample_indices);
   }
 
+  fluorescent_material(const spectral_distribution &a) {
+    albedo = a;
+    sample_excitation = emission_spectra;
+    sample_emission = emission_spectra;
+  }
+
   virtual bool scatter(const ray &r_in, const hit_record<spectral_material> &rec, spectral_scattered_record &s_rec) const {
     s_rec.is_fluor = true;
     s_rec.attenuation = albedo;

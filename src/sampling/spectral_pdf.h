@@ -8,10 +8,15 @@
 
 class spectral_pdf {
  public:
-  virtual ~spectral_pdf() {}
+  spectral_pdf(const spectral_distribution &p) {
+    pdf = p;
+    // CDFを計算
+    cdf = pdf.calc_cdf();
+  }
 
-  virtual double value() const = 0;
-  virtual std::vector<size_t> generate() const = 0;
+ public:
+  spectral_distribution pdf;
+  spectral_distribution cdf;
 };
 
 /// 一様サンプル
@@ -25,10 +30,28 @@ inline std::vector<size_t> random_sample_wavelengths(size_t full_size, size_t sa
 }
 
 /// 波長を考慮したサンプル
-inline std::vector<size_t> importance_sample_wavelengths(size_t full_size, size_t sample_size) {
-  std::vector<size_t> indices(full_size), out;
-  /// TODO: 波長をインポータンスサンプル
-  return out;
+inline std::vector<size_t> importance_sample_wavelengths(const spectral_pdf &mix_pdf, size_t sample_size) {
+  std::vector<double> random_num;
+  std::vector<size_t> indices;
+  for (int i = 0; i < sample_size; ++i) {
+    random_num.push_back(random_double());
+  }
+  // 昇順ソート
+  std::sort(random_num.begin(), random_num.end());
+  int x = 0;
+  for (int y = 0; y < random_num.size(); ++y) {
+    double tmp_y = random_num[y];
+    while (x < mix_pdf.cdf.size()) {
+      double cdf_val = mix_pdf.cdf.get_intensity(x);
+      if (tmp_y <= cdf_val) {
+        indices.push_back(x);
+        ++x;
+        break;
+      }
+      ++x;
+    }
+  }
+  return indices;
 }
 
 #endif //RTCAMP2022_SRC_SAMPLING_SPECTRAL_PDF_H_
