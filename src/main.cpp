@@ -30,7 +30,8 @@
 void execute() {
   int nx = 600;
   int ny = 600;
-  std::cout << "PPS: " << PPS << std::endl;
+  std::cout << "PPS(RGB): " << RGB_PPS << std::endl;
+  std::cout << "PPS(SPECTRAL): " << SPECTRAL_PPS << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
   std::cout << "OpenMP threads: " << MAX_THREAD_NUM << " / " << omp_get_max_threads() << std::endl;
   std::cout << "========== Render ==========" << std::endl;
@@ -69,7 +70,7 @@ void execute() {
     if (frame <= RGB_MAX_FRAME) {
       /// RGBレンダリング
       auto world = construct_scene(frame, RGB_STOP_FRAME, RGB_MAX_FRAME);
-      rgb_render(output.data, nx, ny, PPS, world, rgb_lights, frame);
+      rgb_render(output.data, nx, ny, RGB_PPS, world, rgb_lights, frame);
     } else {
       /// スペクトラルレンダリング
       auto sample_wavelengths = full_wavelengths();
@@ -78,7 +79,7 @@ void execute() {
       auto spectral_frame = frame - RGB_MAX_FRAME;
       auto spectral_max_frame = MAX_FRAME - RGB_MAX_FRAME;
       auto world = construct_spectral_scene(spectral_frame, SPECTRAL_STOP_FRAME, spectral_max_frame, sample_wavelengths);
-      spectral_render(output.data, nx, ny, PPS, sample_wavelengths, world, spectral_lights, frame);
+      spectral_render(output.data, nx, ny, SPECTRAL_PPS, sample_wavelengths, world, spectral_lights, frame);
     }
 
     /// PNG出力
@@ -110,11 +111,9 @@ void execute() {
 
 int main() {
   // 実行開始
-  // TODO: 一旦タイマーを外す対応
-  // std::thread timer(program_timer);
-  // std::thread exec(execute);
-  // timer.join();
-  // exec.join();
-  execute();
+  std::thread timer(program_timer);
+  std::thread exec(execute);
+  timer.join();
+  exec.join();
   return 0;
 }
