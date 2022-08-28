@@ -13,7 +13,7 @@ class fluorescent_material : public spectral_material {
 
   fluorescent_material(const spectral_distribution &a) {
     albedo = a;
-    sample_excitation = emission_spectra;
+    sample_excitation = excitation_spectra;
     sample_emission = emission_spectra;
   }
 
