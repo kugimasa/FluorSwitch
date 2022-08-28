@@ -69,6 +69,7 @@ inline void program_timer() {
 #define PPS 15 // 15
 #define RGB_STOP_FRAME 5
 #define RGB_MAX_FRAME 40
+#define SPECTRAL_STOP_FRAME 90
 #define MAX_FRAME 100
 #define MAX_THREAD_NUM 8
 #define MAX_RAY_DEPTH 8 // 8

@@ -16,8 +16,7 @@ inline double spectral_sphere_x(double t) {
   return SPHERE_SPECTRAL_END_X * t + SPHERE_SPECTRAL_START_X * (1 - t);
 }
 
-inline hittable_list<spectral_material> construct_spectral_scene(int frame, int max_frame, std::vector<size_t> wavelength_indices) {
-  double t = (double) (frame) / (double) (max_frame); // [0, 1]
+inline hittable_list<spectral_material> construct_spectral_scene(int frame, int spectral_stop_frame, int max_frame, std::vector<size_t> wavelength_indices) {
   hittable_list<spectral_material> world;
   auto blue = spectral_distribution(blue_spectra, wavelength_indices);
   auto red = spectral_distribution(red_spectra, wavelength_indices);
@@ -39,6 +38,10 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, LIGHT_WIDTH, red_mat, red_mat, white_mat, white_mat, blue_mat, uv_light_mat);
   world.add(make_shared<hittable_list<spectral_material>>(cb));
   /// 移動する球
+  double t = (double) (frame) / (double) (spectral_stop_frame); // [0, 1];
+  if (frame > spectral_stop_frame) {
+    t = 1;
+  }
   double x_t = spectral_sphere_x(t);
   world.add(make_shared<sphere<spectral_material>>(vec3(x_t, SPHERE_RADIUS, SPHERE_Z), SPHERE_RADIUS, fluo_mat));
   /// 蛍光スイッチ
@@ -77,7 +80,6 @@ inline hittable_list<material> construct_scene(int frame, int stop_frame, int ma
   /// 移動する球
   if (frame > stop_frame) {
     t = (double) (frame - stop_frame) / (double) (max_frame - stop_frame); // [0, 1]
-
   }
   double x_t = rgb_sphere_x(t);
   world.add(make_shared<sphere<material>>(vec3(x_t, SPHERE_RADIUS, SPHERE_Z), SPHERE_RADIUS, rgb_black_mat));

@@ -75,7 +75,7 @@ void execute() {
       // auto sample_wavelengths = importance_sample_wavelengths();
       auto spectral_frame = frame - RGB_MAX_FRAME;
       auto spectral_max_frame = MAX_FRAME - RGB_MAX_FRAME;
-      auto world = construct_spectral_scene(spectral_frame, spectral_max_frame, sample_wavelengths);
+      auto world = construct_spectral_scene(spectral_frame, SPECTRAL_STOP_FRAME, spectral_max_frame, sample_wavelengths);
       auto lights = construct_spectral_light_sampler();
       spectral_render(output.data, nx, ny, PPS, sample_wavelengths, world, lights, frame);
     }
