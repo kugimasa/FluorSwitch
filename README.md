@@ -1,8 +1,8 @@
-# rtcamp2022
+# FluorSwitch
 
-![Build Status](https://github.com/kugimasa/rtcamp2022/actions/workflows/ubuntu_build.yml/badge.svg)
+![Build Status](https://github.com/kugimasa/FluorSwitch/actions/workflows/ubuntu_build.yml/badge.svg)
 
-A ray tracer for Ray Tracing Camp 2022
+A rgb-spectral hybrid ray tracer for Ray Tracing Camp 8 (2022)
 
 This is a renderer based on the ["Ray Tracing in One Weekend"](https://raytracing.github.io/) series.
 

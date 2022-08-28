@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.15)
 
 # The project information
-project(rtcamp2022 VERSION 0.1.0 LANGUAGES C CXX)
-message(STATUS "rtcamp2022🏕 version: ${PROJECT_VERSION}")
+project(FluorSwitch VERSION 1.0.0 LANGUAGES C CXX)
+message(STATUS "FluorSwitch🏕 version: ${PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(rtcamp2022
+add_executable(FluorSwitch
                src/main.cpp
                src/camera/camera.h
                src/material/fluorescent_material.h
@@ -48,7 +48,7 @@ include_directories("external/fast-cpp-csv-parser")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-target_link_libraries(rtcamp2022 PUBLIC "-pthread")
+target_link_libraries(FluorSwitch PUBLIC "-pthread")
 
 find_package(OpenMP)
 if (OPENMP_FOUND)

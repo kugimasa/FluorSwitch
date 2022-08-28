@@ -26,7 +26,7 @@ jobs:
       - name: Render
         run: |
           cd ${{github.workspace}}/build
-          ./rtcamp2022
+          ./FluorSwitch
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3.1.0

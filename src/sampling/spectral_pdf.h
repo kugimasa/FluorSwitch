@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_SAMPLING_SPECTRAL_PDF_H_
-#define RTCAMP2022_SRC_SAMPLING_SPECTRAL_PDF_H_
+#ifndef FLUORSWITCH_SRC_SAMPLING_SPECTRAL_PDF_H_
+#define FLUORSWITCH_SRC_SAMPLING_SPECTRAL_PDF_H_
 
 #include <numeric>
 #include <random>
@@ -76,4 +76,4 @@ inline std::vector<size_t> importance_sample_wavelengths() {
   return indices;
 }
 
-#endif //RTCAMP2022_SRC_SAMPLING_SPECTRAL_PDF_H_
+#endif //FLUORSWITCH_SRC_SAMPLING_SPECTRAL_PDF_H_

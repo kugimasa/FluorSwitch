@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_UTILS_BVH_H_
-#define RTCAMP2022_SRC_UTILS_BVH_H_
+#ifndef FLUORSWITCH_SRC_UTILS_BVH_H_
+#define FLUORSWITCH_SRC_UTILS_BVH_H_
 
 #include <algorithm>
 #include "hittable.h"
@@ -111,4 +111,4 @@ bool bvh_node<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat
   return hit_left || hit_right;
 }
 
-#endif //RTCAMP2022_SRC_UTILS_BVH_H_
+#endif //FLUORSWITCH_SRC_UTILS_BVH_H_

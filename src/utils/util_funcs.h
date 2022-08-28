@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_UTILS_UTIL_FUNCS_H_
-#define RTCAMP2022_SRC_UTILS_UTIL_FUNCS_H_
+#ifndef FLUORSWITCH_SRC_UTILS_UTIL_FUNCS_H_
+#define FLUORSWITCH_SRC_UTILS_UTIL_FUNCS_H_
 
 #include <cmath>
 #include <cstdlib>
@@ -118,4 +118,4 @@ inline void drawPix(unsigned char *data,
   p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
 }
 
-#endif //RTCAMP2022_SRC_UTILS_UTIL_FUNCS_H_
+#endif //FLUORSWITCH_SRC_UTILS_UTIL_FUNCS_H_

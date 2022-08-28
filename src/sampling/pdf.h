@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_SAMPLING_PDF_H_
-#define RTCAMP2022_SRC_SAMPLING_PDF_H_
+#ifndef FLUORSWITCH_SRC_SAMPLING_PDF_H_
+#define FLUORSWITCH_SRC_SAMPLING_PDF_H_
 
 #include "../utils/vec3.h"
 #include "../utils/util_funcs.h"
@@ -93,4 +93,4 @@ class mixture_pdf : public pdf {
   shared_ptr<pdf> p[2];
 };
 
-#endif //RTCAMP2022_SRC_SAMPLING_PDF_H_
+#endif //FLUORSWITCH_SRC_SAMPLING_PDF_H_

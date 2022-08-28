@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_
-#define RTCAMP2022_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_
+#ifndef FLUORSWITCH_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_
+#define FLUORSWITCH_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_
 
 #include "spectral_material.h"
 /// 拡散反射面
@@ -41,4 +41,4 @@ class fluorescent_material : public spectral_material {
   spectral_distribution sample_emission;
 };
 
-#endif //RTCAMP2022_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_
+#endif //FLUORSWITCH_SRC_MATERIAL_FLUORESCENT_MATERIAL_H_

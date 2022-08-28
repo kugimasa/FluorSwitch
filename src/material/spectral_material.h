@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
-#define RTCAMP2022_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
+#ifndef FLUORSWITCH_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
+#define FLUORSWITCH_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
 #include "../utils/texture.h"
 #include "../utils/onb.h"
 #include "../utils/hittable.h"
@@ -53,4 +53,4 @@ class spectral_lambertian : public spectral_material {
   spectral_distribution albedo;
 };
 
-#endif //RTCAMP2022_SRC_MATERIAL_SPECTRAL_MATERIAL_H_
+#endif //FLUORSWITCH_SRC_MATERIAL_SPECTRAL_MATERIAL_H_

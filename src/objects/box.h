@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_OBJECTS_BOX_H_
-#define RTCAMP2022_SRC_OBJECTS_BOX_H_
+#ifndef FLUORSWITCH_SRC_OBJECTS_BOX_H_
+#define FLUORSWITCH_SRC_OBJECTS_BOX_H_
 
 #include "../utils/util_funcs.h"
 #include "../utils/hittable_list.h"
@@ -58,4 +58,4 @@ bool box<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat> &re
   return sides.hit(r, t_min, t_max, rec);
 }
 
-#endif //RTCAMP2022_SRC_OBJECTS_BOX_H_
+#endif //FLUORSWITCH_SRC_OBJECTS_BOX_H_

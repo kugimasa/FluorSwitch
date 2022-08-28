@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_RENDER_SPECTRAL_PATH_TRACE_H_
-#define RTCAMP2022_SRC_RENDER_SPECTRAL_PATH_TRACE_H_
+#ifndef FLUORSWITCH_SRC_RENDER_SPECTRAL_PATH_TRACE_H_
+#define FLUORSWITCH_SRC_RENDER_SPECTRAL_PATH_TRACE_H_
 
 #include "../utils/spectral_distribution.h"
 #include "../utils/ray.h"
@@ -76,4 +76,4 @@ void inline spectral_render(unsigned char *data, unsigned int nx, unsigned int n
   }
 }
 
-#endif //RTCAMP2022_SRC_RENDER_SPECTRAL_PATH_TRACE_H_
+#endif //FLUORSWITCH_SRC_RENDER_SPECTRAL_PATH_TRACE_H_

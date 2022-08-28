@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_UTILS_PERLIN_H_
-#define RTCAMP2022_SRC_UTILS_PERLIN_H_
+#ifndef FLUORSWITCH_SRC_UTILS_PERLIN_H_
+#define FLUORSWITCH_SRC_UTILS_PERLIN_H_
 
 #include "util_funcs.h"
 
@@ -109,4 +109,4 @@ class perlin {
   }
 };
 
-#endif //RTCAMP2022_SRC_UTILS_PERLIN_H_
+#endif //FLUORSWITCH_SRC_UTILS_PERLIN_H_

@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_UTILS_RTW_STB_IMAGE_H_
-#define RTCAMP2022_SRC_UTILS_RTW_STB_IMAGE_H_
+#ifndef FLUORSWITCH_SRC_UTILS_RTW_STB_IMAGE_H_
+#define FLUORSWITCH_SRC_UTILS_RTW_STB_IMAGE_H_
 
 // Disable pedantic warnings for this external library.
 #ifdef _MSC_VER
@@ -18,4 +18,4 @@
 #pragma warning (pop)
 #endif
 
-#endif //RTCAMP2022_SRC_UTILS_RTW_STB_IMAGE_H_
+#endif //FLUORSWITCH_SRC_UTILS_RTW_STB_IMAGE_H_

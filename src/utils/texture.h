@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_UTILS_TEXTURE_H_
-#define RTCAMP2022_SRC_UTILS_TEXTURE_H_
+#ifndef FLUORSWITCH_SRC_UTILS_TEXTURE_H_
+#define FLUORSWITCH_SRC_UTILS_TEXTURE_H_
 
 #include "util_funcs.h"
 #include "rtw_stb_image.h"
@@ -121,4 +121,4 @@ class image_texture : public texture {
   int bytes_per_scanline;
 };
 
-#endif //RTCAMP2022_SRC_UTILS_TEXTURE_H_
+#endif //FLUORSWITCH_SRC_UTILS_TEXTURE_H_

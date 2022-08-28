@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_UTILS_ONB_H_
-#define RTCAMP2022_SRC_UTILS_ONB_H_
+#ifndef FLUORSWITCH_SRC_UTILS_ONB_H_
+#define FLUORSWITCH_SRC_UTILS_ONB_H_
 
 #include "util_funcs.h"
 
@@ -34,4 +34,4 @@ void onb::build_from_w(const vec3 &n) {
   axis[0] = cross(w(), v());
 }
 
-#endif //RTCAMP2022_SRC_UTILS_ONB_H_
+#endif //FLUORSWITCH_SRC_UTILS_ONB_H_

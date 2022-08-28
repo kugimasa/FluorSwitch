@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_OBJECTS_AARECT_H_
-#define RTCAMP2022_SRC_OBJECTS_AARECT_H_
+#ifndef FLUORSWITCH_SRC_OBJECTS_AARECT_H_
+#define FLUORSWITCH_SRC_OBJECTS_AARECT_H_
 
 #include "../utils/util_funcs.h"
 #include "../utils/hittable.h"
@@ -181,4 +181,4 @@ bool yz_rect<mat>::hit(const ray &r, double t_min, double t_max, hit_record<mat>
   return true;
 }
 
-#endif //RTCAMP2022_SRC_OBJECTS_AARECT_H_
+#endif //FLUORSWITCH_SRC_OBJECTS_AARECT_H_

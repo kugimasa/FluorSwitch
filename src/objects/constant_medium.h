@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_OBJECTS_CONSTANT_MEDIUM_H_
-#define RTCAMP2022_SRC_OBJECTS_CONSTANT_MEDIUM_H_
+#ifndef FLUORSWITCH_SRC_OBJECTS_CONSTANT_MEDIUM_H_
+#define FLUORSWITCH_SRC_OBJECTS_CONSTANT_MEDIUM_H_
 
 #include "../utils/hittable.h"
 #include "../material/material.h"
@@ -71,4 +71,4 @@ bool constant_medium<mat>::hit(const ray &r, double t_min, double t_max, hit_rec
   return true;
 }
 
-#endif //RTCAMP2022_SRC_OBJECTS_CONSTANT_MEDIUM_H_
+#endif //FLUORSWITCH_SRC_OBJECTS_CONSTANT_MEDIUM_H_

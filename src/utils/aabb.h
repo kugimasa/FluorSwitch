@@ -1,8 +1,8 @@
 // Using the code of Ray Tracing: The Next Week
 // https://raytracing.github.io/books/RayTracingTheNextWeek.html
 
-#ifndef RTCAMP2022_SRC_UTILS_AABB_H_
-#define RTCAMP2022_SRC_UTILS_AABB_H_
+#ifndef FLUORSWITCH_SRC_UTILS_AABB_H_
+#define FLUORSWITCH_SRC_UTILS_AABB_H_
 
 #include "util_funcs.h"
 
@@ -52,4 +52,4 @@ aabb surrounding_box(aabb box0, aabb box1) {
   return aabb(small, big);
 }
 
-#endif //RTCAMP2022_SRC_UTILS_AABB_H_
+#endif //FLUORSWITCH_SRC_UTILS_AABB_H_

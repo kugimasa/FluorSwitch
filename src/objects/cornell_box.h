@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_OBJECTS_CORNELL_BOX_H_
-#define RTCAMP2022_SRC_OBJECTS_CORNELL_BOX_H_
+#ifndef FLUORSWITCH_SRC_OBJECTS_CORNELL_BOX_H_
+#define FLUORSWITCH_SRC_OBJECTS_CORNELL_BOX_H_
 
 #include "../utils/hittable_list.h"
 #include "../material/material.h"
@@ -44,4 +44,4 @@ class cornell_box : public hittable_list<mat> {
 
 };
 
-#endif //RTCAMP2022_SRC_OBJECTS_CORNELL_BOX_H_
+#endif //FLUORSWITCH_SRC_OBJECTS_CORNELL_BOX_H_

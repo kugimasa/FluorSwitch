@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_RENDER_PATH_TRACE_H_
-#define RTCAMP2022_SRC_RENDER_PATH_TRACE_H_
+#ifndef FLUORSWITCH_SRC_RENDER_PATH_TRACE_H_
+#define FLUORSWITCH_SRC_RENDER_PATH_TRACE_H_
 
 #include "../utils/vec3.h"
 #include "../utils/ray.h"
@@ -70,4 +70,4 @@ void rgb_render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
   }
 }
 
-#endif //RTCAMP2022_SRC_RENDER_PATH_TRACE_H_
+#endif //FLUORSWITCH_SRC_RENDER_PATH_TRACE_H_

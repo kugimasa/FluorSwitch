@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_MATERIAL_SPECTRAL_LIGHT_H_
-#define RTCAMP2022_SRC_MATERIAL_SPECTRAL_LIGHT_H_
+#ifndef FLUORSWITCH_SRC_MATERIAL_SPECTRAL_LIGHT_H_
+#define FLUORSWITCH_SRC_MATERIAL_SPECTRAL_LIGHT_H_
 
 #include "spectral_material.h"
 #include "../utils/hittable.h"
@@ -25,4 +25,4 @@ class spectral_diffuse_light : public spectral_material {
   spectral_distribution emit;
 };
 
-#endif //RTCAMP2022_SRC_MATERIAL_SPECTRAL_LIGHT_H_
+#endif //FLUORSWITCH_SRC_MATERIAL_SPECTRAL_LIGHT_H_

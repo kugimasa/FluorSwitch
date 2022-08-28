@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_SCENE_SCENE_H_
-#define RTCAMP2022_SRC_SCENE_SCENE_H_
+#ifndef FLUORSWITCH_SRC_SCENE_SCENE_H_
+#define FLUORSWITCH_SRC_SCENE_SCENE_H_
 
 #include "../material/fluorescent_material.h"
 #include "../material/spectral_material.h"
@@ -103,4 +103,4 @@ inline shared_ptr<hittable_list<material>> construct_light_sampler() {
 //  world.add(obj_bvh);
 //  std::cout << "++++++++++ Finish ++++++++++" << std::endl;
 
-#endif //RTCAMP2022_SRC_SCENE_SCENE_H_
+#endif //FLUORSWITCH_SRC_SCENE_SCENE_H_

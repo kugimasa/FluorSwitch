@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_OBJECTS_TRIANGLE_H_
-#define RTCAMP2022_SRC_OBJECTS_TRIANGLE_H_
+#ifndef FLUORSWITCH_SRC_OBJECTS_TRIANGLE_H_
+#define FLUORSWITCH_SRC_OBJECTS_TRIANGLE_H_
 
 #include "../utils/hittable.h"
 
@@ -141,4 +141,4 @@ vec3 triangle<mat>::barycentric(vec3 &p) {
   return vec3(u_, v_, w_);
 }
 
-#endif //RTCAMP2022_SRC_OBJECTS_TRIANGLE_H_
+#endif //FLUORSWITCH_SRC_OBJECTS_TRIANGLE_H_

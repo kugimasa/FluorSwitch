@@ -1,5 +1,5 @@
-#ifndef RTCAMP2022_SRC_OBJECTS_GEOMETRY_H_
-#define RTCAMP2022_SRC_OBJECTS_GEOMETRY_H_
+#ifndef FLUORSWITCH_SRC_OBJECTS_GEOMETRY_H_
+#define FLUORSWITCH_SRC_OBJECTS_GEOMETRY_H_
 
 #define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
 // Optional. define TINYOBJLOADER_USE_MAPBOX_EARCUT gives robust trinagulation. Requires C++11
@@ -142,4 +142,4 @@ double geometry<mat>::pdf_value(const point3 &o, const vec3 &v) const {
   return hittable<mat>::pdf_value(o, v);
 }
 
-#endif //RTCAMP2022_SRC_OBJECTS_GEOMETRY_H_
+#endif //FLUORSWITCH_SRC_OBJECTS_GEOMETRY_H_
