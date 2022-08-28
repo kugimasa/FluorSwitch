@@ -73,7 +73,8 @@ inline void program_timer() {
 #define SPECTRAL_STOP_FRAME (90 - RGB_MAX_FRAME)
 #define MAX_FRAME 100
 #define MAX_THREAD_NUM 1
-#define MAX_RAY_DEPTH 8 // 8
+#define RGB_MAX_RAY_DEPTH 8 // 8
+#define SPECTRAL_MAX_RAY_DEPTH 4 // 8
 #define CHANNEL_NUM 3
 
 // シーン用の情報
@@ -95,7 +96,7 @@ inline color gamma_correct(const color col) {
   if (b != b) b = 0.0;
   if (g != g) g = 0.0;
 
-  // サンプル数の平均 + ガンマ補正(gamma=2.0
+  // サンプル数の平均 + ガンマ補正(gamma=2.0)
   r = sqrt(r);
   g = sqrt(g);
   b = sqrt(b);

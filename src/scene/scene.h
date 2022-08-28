@@ -16,24 +16,24 @@ inline double spectral_sphere_x(double t) {
   return SPHERE_SPECTRAL_END_X * t + SPHERE_SPECTRAL_START_X * (1 - t);
 }
 
-inline hittable_list<spectral_material> construct_spectral_scene(int frame, int spectral_stop_frame, int max_frame, std::vector<size_t> wavelength_indices) {
-  hittable_list<spectral_material> world;
-  auto blue = spectral_distribution(blue_spectra, wavelength_indices);
-  auto red = spectral_distribution(red_spectra, wavelength_indices);
-  auto white = spectral_distribution(white_spectra, wavelength_indices);
-  auto black = spectral_distribution(black_spectra, wavelength_indices);
-  auto d65_light = spectral_distribution(d65_spectra, wavelength_indices);
-  auto uv_light = spectral_distribution(uv_spectra, wavelength_indices);
+/// マテリアル設定
+auto blue_mat = make_shared<spectral_lambertian>(blue_spectra);
+auto red_mat = make_shared<spectral_lambertian>(red_spectra);
+auto white_mat = make_shared<spectral_lambertian>(white_spectra);
+auto black_mat = make_shared<spectral_lambertian>(black_spectra);
+auto uv_light_mat = make_shared<spectral_diffuse_light>(uv_spectra);
+// NEED FIX
+auto fluo_mat = make_shared<fluorescent_material>(black_spectra);
 
-  /// マテリアル設定
-  auto blue_mat = make_shared<spectral_lambertian>(blue);
-  auto red_mat = make_shared<spectral_lambertian>(red);
-  auto white_mat = make_shared<spectral_lambertian>(white);
-  auto black_mat = make_shared<spectral_lambertian>(black);
-  auto d65_light_mat = make_shared<spectral_diffuse_light>(d65_light);
-  auto uv_light_mat = make_shared<spectral_diffuse_light>(uv_light);
-  // NEED FIX
-  auto fluo_mat = make_shared<fluorescent_material>(black, wavelength_indices);
+inline hittable_list<spectral_material> construct_spectral_scene(int frame, int spectral_stop_frame, int max_frame) {
+  hittable_list<spectral_material> world;
+  // フルセットのため不要
+//  auto blue = spectral_distribution(blue_spectra, wavelength_indices);
+//  auto red = spectral_distribution(red_spectra, wavelength_indices);
+//  auto white = spectral_distribution(white_spectra, wavelength_indices);
+//  auto black = spectral_distribution(black_spectra, wavelength_indices);
+//  auto uv_light = spectral_distribution(uv_spectra, wavelength_indices);
+
   /// コーネルボックス
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, LIGHT_WIDTH, red_mat, red_mat, white_mat, white_mat, blue_mat, uv_light_mat);
   world.add(make_shared<hittable_list<spectral_material>>(cb));

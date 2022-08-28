@@ -28,10 +28,17 @@
 
 // メインの処理
 void execute() {
+//#ifndef NDEBUG
+  // chrono変数
+  std::chrono::system_clock::time_point exec_start, start, end;
+  exec_start = std::chrono::system_clock::now();
+//#endif
   int nx = 600;
   int ny = 600;
   std::cout << "PPS(RGB): " << RGB_PPS << std::endl;
   std::cout << "PPS(SPECTRAL): " << SPECTRAL_PPS << std::endl;
+  std::cout << "ray bounce(RGB): " << RGB_MAX_RAY_DEPTH << std::endl;
+  std::cout << "ray bounce(SPECTRAL): " << SPECTRAL_MAX_RAY_DEPTH << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
   std::cout << "OpenMP threads: " << MAX_THREAD_NUM << " / " << omp_get_max_threads() << std::endl;
   std::cout << "========== Render ==========" << std::endl;
@@ -42,17 +49,13 @@ void execute() {
   output.height = ny;
   output.ch = CHANNEL_NUM;
 
-//#ifndef NDEBUG
-  // chrono変数
-  std::chrono::system_clock::time_point render_start, start, end;
-//#endif
-
   // 描画開始
-  render_start = std::chrono::system_clock::now();
   auto rgb_lights = construct_light_sampler();
   auto spectral_lights = construct_spectral_light_sampler();
+  // 波長はフルセットを使用
+  auto sample_wavelengths = full_wavelengths();
 
-  for (int frame = 1; frame <= MAX_FRAME; ++frame) {
+  for (int frame = 61; frame <= MAX_FRAME; ++frame) {
 //#ifndef NDEBUG
     // 時間計測開始
     start = std::chrono::system_clock::now();
@@ -73,12 +76,11 @@ void execute() {
       rgb_render(output.data, nx, ny, RGB_PPS, world, rgb_lights, frame);
     } else {
       /// スペクトラルレンダリング
-      auto sample_wavelengths = full_wavelengths();
       // auto sample_wavelengths = random_sample_wavelengths();
       // auto sample_wavelengths = importance_sample_wavelengths();
       auto spectral_frame = frame - RGB_MAX_FRAME;
       auto spectral_max_frame = MAX_FRAME - RGB_MAX_FRAME;
-      auto world = construct_spectral_scene(spectral_frame, SPECTRAL_STOP_FRAME, spectral_max_frame, sample_wavelengths);
+      auto world = construct_spectral_scene(spectral_frame, SPECTRAL_STOP_FRAME, spectral_max_frame);
       spectral_render(output.data, nx, ny, SPECTRAL_PPS, sample_wavelengths, world, spectral_lights, frame);
     }
 
@@ -104,8 +106,8 @@ void execute() {
   // 時間計測終了
   end = std::chrono::system_clock::now();
   // 経過時間の算出
-  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - render_start).count();
-  std::cout << "\n[RenderTime]: " << elapsed * 0.001 << "(sec)" << std::endl;
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - exec_start).count();
+  std::cout << "\nExecution Time: " << elapsed * 0.001 << "(sec)" << std::endl;
   exit(0);
 }
 

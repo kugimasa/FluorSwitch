@@ -66,7 +66,7 @@ void inline spectral_render(unsigned char *data, unsigned int nx, unsigned int n
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = SCENE_CAMERA.get_ray(u, v);
-        spectra = spectra + spectral_path_trace(r, world, lights, MAX_RAY_DEPTH);
+        spectra = spectra + spectral_path_trace(r, world, lights, SPECTRAL_MAX_RAY_DEPTH);
       }
 
       auto col = spectralToRgb(spectra / ns);

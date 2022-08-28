@@ -179,12 +179,11 @@ const auto blue_spectra = spectral_distribution("./assets/spectra/macbeth_08_pur
 const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_moderate_red.csv");
 const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
 const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
-const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
 const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv");
 const auto excitation_spectra = spectral_distribution("./assets/spectra/fluor/qdot545in.csv");
 const auto emission_spectra = spectral_distribution("./assets/spectra/fluor/qdot545out.csv");
 const auto zero_spectra = spectral_distribution(black_spectra, 0.0);
-const auto full_wavelength_size = d65_spectra.size();
+const auto full_wavelength_size = blue_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
 #define WAVELENGTH_SAMPLE_SIZE 81
 const double inv_wave_pdf_val = (double) x_bar.size() / WAVELENGTH_SAMPLE_SIZE;

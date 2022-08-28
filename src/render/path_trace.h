@@ -61,7 +61,7 @@ void rgb_render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
         double u = double(i + drand48()) / double(nx);
         double v = double(j + drand48()) / double(ny);
         ray r = SCENE_CAMERA.get_ray(u, v);
-        col += path_trace(r, world, lights, MAX_RAY_DEPTH);
+        col += path_trace(r, world, lights, RGB_MAX_RAY_DEPTH);
       }
       col /= double(ns);
       col = gamma_correct(col);
