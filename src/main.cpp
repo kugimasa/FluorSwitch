@@ -43,9 +43,11 @@ void execute() {
 
 //#ifndef NDEBUG
   // chrono変数
-  std::chrono::system_clock::time_point start, end;
+  std::chrono::system_clock::time_point render_start, start, end;
 //#endif
 
+  // 描画開始
+  render_start = std::chrono::system_clock::now();
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {
 //#ifndef NDEBUG
     // 時間計測開始
@@ -93,10 +95,15 @@ void execute() {
     end = std::chrono::system_clock::now();
     // 経過時間の算出
     double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "\n[" << sout.str() << "]: " << elapsed * 0.001 << "(sec)s" << std::endl;
+    std::cout << "\n[" << sout.str() << "]: " << elapsed * 0.001 << "(sec)" << std::endl;
 //#endif
   }
   std::cout << "\n========== Finish ==========" << std::endl;
+  // 時間計測終了
+  end = std::chrono::system_clock::now();
+  // 経過時間の算出
+  double elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - render_start).count();
+  std::cout << "\n[RenderTime]: " << elapsed * 0.001 << "(sec)" << std::endl;
   exit(0);
 }
 
