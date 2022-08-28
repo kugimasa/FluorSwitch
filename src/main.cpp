@@ -70,17 +70,15 @@ void execute() {
     /// 背景色の指定
     memset(output.data, 0xFF, output.width * output.height * output.ch);
 
-    if (frame <= RGB_MAX_FRAME) {
+    if (frame <= RGB_END_FRAME) {
       /// RGBレンダリング
-      auto world = construct_scene(frame, RGB_STOP_FRAME, RGB_MAX_FRAME);
+      auto world = construct_scene(frame, RGB_END_FRAME);
       rgb_render(output.data, nx, ny, RGB_PPS, world, rgb_lights, frame);
     } else {
       /// スペクトラルレンダリング
       // auto sample_wavelengths = random_sample_wavelengths();
       // auto sample_wavelengths = importance_sample_wavelengths();
-      auto spectral_frame = frame - RGB_MAX_FRAME;
-      auto spectral_max_frame = MAX_FRAME - RGB_MAX_FRAME;
-      auto world = construct_spectral_scene(spectral_frame, SPECTRAL_STOP_FRAME, spectral_max_frame);
+      auto world = construct_spectral_scene(frame, MAX_FRAME);
       spectral_render(output.data, nx, ny, SPECTRAL_PPS, sample_wavelengths, world, spectral_lights, frame);
     }
 

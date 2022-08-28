@@ -68,10 +68,6 @@ inline void program_timer() {
 
 #define RGB_PPS 24 // 15
 #define SPECTRAL_PPS 8 // 8
-#define RGB_STOP_FRAME 5
-#define RGB_MAX_FRAME 60
-#define SPECTRAL_STOP_FRAME (90 - RGB_MAX_FRAME)
-#define MAX_FRAME 100
 #define MAX_THREAD_NUM 1
 #define RGB_MAX_RAY_DEPTH 8 // 8
 #define SPECTRAL_MAX_RAY_DEPTH 4 // 8
@@ -80,10 +76,18 @@ inline void program_timer() {
 // シーン用の情報
 #define SPHERE_RADIUS 55
 #define LIGHT_WIDTH 150
-#define SPHERE_RGB_START_X 100
-#define SPHERE_SPECTRAL_START_X (SPHERE_RGB_START_X + (545 - SPHERE_RGB_START_X - SPHERE_RADIUS))
-#define SPHERE_SPECTRAL_END_X 300
 #define SPHERE_Z 200
+
+// アニメーション情報
+#define RGB_STOP_FRAME 2
+#define RGB_LIGHT_OFF_FRAME 40
+#define RGB_END_FRAME 50
+#define UV_LIGHT_ON_FRAME 60
+#define MAX_FRAME 100
+
+#define SPHERE_RGB_START_X 200
+#define SPHERE_SPECTRAL_START_X (545 - 2.5 * SPHERE_RADIUS)
+#define SPHERE_SPECTRAL_END_X 300
 
 inline color gamma_correct(const color col) {
   auto r = col.x();
