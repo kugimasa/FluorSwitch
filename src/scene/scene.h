@@ -36,16 +36,20 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   auto fluo_mat = make_shared<fluorescent_material>(black, wavelength_indices);
   /// コーネルボックス
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, LIGHT_WIDTH, red_mat, red_mat, white_mat, white_mat, blue_mat, uv_light_mat);
-  world.add(make_shared<hittable_list<spectral_material>>(cb));
+  world.add(make_shared<bvh_node<spectral_material>>(cb, 0.0, 1.0));
+
+  /// 配置物
+  hittable_list<spectral_material> objects;
   /// 移動する球
   double t = (double) (frame) / (double) (spectral_stop_frame); // [0, 1];
   if (frame > spectral_stop_frame) {
     t = 1;
   }
   double x_t = spectral_sphere_x(t);
-  world.add(make_shared<sphere<spectral_material>>(vec3(x_t, SPHERE_RADIUS, SPHERE_Z), SPHERE_RADIUS, fluo_mat));
+  objects.add(make_shared<sphere<spectral_material>>(vec3(x_t, SPHERE_RADIUS, SPHERE_Z), SPHERE_RADIUS, fluo_mat));
   /// 蛍光スイッチ
-  world.add(make_shared<box<spectral_material>>(vec3(545, SPHERE_RADIUS - 10, SPHERE_Z - 50), vec3(555, SPHERE_RADIUS + 10, SPHERE_Z + 50), black_mat));
+  objects.add(make_shared<box<spectral_material>>(vec3(545, SPHERE_RADIUS - 10, SPHERE_Z - 50), vec3(555, SPHERE_RADIUS + 10, SPHERE_Z + 50), black_mat));
+  world.add(make_shared<bvh_node<spectral_material>>(objects, 0.0, 1.0));
   return world;
 }
 
@@ -74,17 +78,23 @@ inline double rgb_sphere_x(double t) {
 inline hittable_list<material> construct_scene(int frame, int stop_frame, int max_frame) {
   /// シーンデータ
   hittable_list<material> world;
+
+  /// コーネルボックス
   cornell_box<material> cb = cornell_box<material>(555, LIGHT_WIDTH, rgb_red_mat, rgb_red_mat, rgb_white_mat, rgb_white_mat, rgb_blue_mat, rgb_light_mat);
-  world.add(make_shared<hittable_list<material>>(cb));
+  world.add(make_shared<bvh_node<material>>(cb, 0.0, 1.0));
+
+  /// 配置物
+  hittable_list<material> objects;
   double t = 0;
   /// 移動する球
   if (frame > stop_frame) {
     t = (double) (frame - stop_frame) / (double) (max_frame - stop_frame); // [0, 1]
   }
   double x_t = rgb_sphere_x(t);
-  world.add(make_shared<sphere<material>>(vec3(x_t, SPHERE_RADIUS, SPHERE_Z), SPHERE_RADIUS, rgb_black_mat));
+  objects.add(make_shared<sphere<material>>(vec3(x_t, SPHERE_RADIUS, SPHERE_Z), SPHERE_RADIUS, rgb_black_mat));
   /// 蛍光スイッチ
-  world.add(make_shared<box<material>>(vec3(545, SPHERE_RADIUS - 10, SPHERE_Z - 50), vec3(555, SPHERE_RADIUS + 10, SPHERE_Z + 50), rgb_black_mat));
+  objects.add(make_shared<box<material>>(vec3(545, SPHERE_RADIUS - 10, SPHERE_Z - 50), vec3(555, SPHERE_RADIUS + 10, SPHERE_Z + 50), rgb_black_mat));
+  world.add(make_shared<bvh_node<material>>(objects, 0.0, 1.0));
   return world;
 }
 
