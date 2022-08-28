@@ -66,15 +66,21 @@ inline void program_timer() {
 #include "vec3.h"
 #include "colors.h"
 
-// 30fps * 5 sec
-#define MAX_FRAME 1
+#define PPS 15 // 15
+#define RGB_STOP_FRAME 5
+#define RGB_MAX_FRAME 40
+#define MAX_FRAME 100
 #define MAX_THREAD_NUM 8
-#define MAX_RAY_DEPTH 8
+#define MAX_RAY_DEPTH 8 // 8
 #define CHANNEL_NUM 3
 
 // シーン用の情報
-#define SPHERE_RADIUS 75
+#define SPHERE_RADIUS 55
 #define LIGHT_WIDTH 150
+#define SPHERE_RGB_START_X 75
+#define SPHERE_SPECTRAL_START_X (SPHERE_RGB_START_X + (545 - SPHERE_RGB_START_X - SPHERE_RADIUS))
+#define SPHERE_SPECTRAL_END_X 275
+#define SPHERE_Z 200
 
 inline color gamma_correct(const color col) {
   auto r = col.x();

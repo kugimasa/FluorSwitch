@@ -30,8 +30,7 @@
 void execute() {
   int nx = 600;
   int ny = 600;
-  int ns = 15;
-  std::cout << "PPS: " << ns << std::endl;
+  std::cout << "PPS: " << PPS << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
   std::cout << "OpenMP threads: " << MAX_THREAD_NUM << std::endl;
   std::cout << "========== Render ==========" << std::endl;
@@ -40,7 +39,7 @@ void execute() {
   BITMAPDATA_t output;
   output.width = nx;
   output.height = ny;
-  output.ch = 3;
+  output.ch = CHANNEL_NUM;
 
 //#ifndef NDEBUG
   // chrono変数
@@ -61,19 +60,23 @@ void execute() {
 
     /// 背景色の指定
     memset(output.data, 0xFF, output.width * output.height * output.ch);
-    /// シーンデータ
-    /// スペクトラルレンダリング
-    // auto sample_wavelengths = full_wavelengths();
-    // auto sample_wavelengths = random_sample_wavelengths();
-    // auto sample_wavelengths = importance_sample_wavelengths();
-    // auto world = construct_spectral_scene(frame, MAX_FRAME, sample_wavelengths);
-    // auto lights = construct_spectral_light_sampler(frame, MAX_FRAME);
-    // spectral_render(output.data, nx, ny, ns, sample_wavelengths, world, lights, frame);
 
-    /// RGBレンダリング
-    auto world = construct_scene(frame, MAX_FRAME);
-    auto lights = construct_light_sampler();
-    rgb_render(output.data, nx, ny, ns, world, lights, frame);
+    if (frame <= RGB_MAX_FRAME) {
+      /// RGBレンダリング
+      auto world = construct_scene(frame, RGB_STOP_FRAME, RGB_MAX_FRAME);
+      auto lights = construct_light_sampler();
+      rgb_render(output.data, nx, ny, PPS, world, lights, frame);
+    } else {
+      /// スペクトラルレンダリング
+      auto sample_wavelengths = full_wavelengths();
+      // auto sample_wavelengths = random_sample_wavelengths();
+      // auto sample_wavelengths = importance_sample_wavelengths();
+      auto spectral_frame = frame - RGB_MAX_FRAME;
+      auto spectral_max_frame = MAX_FRAME - RGB_MAX_FRAME;
+      auto world = construct_spectral_scene(spectral_frame, spectral_max_frame, sample_wavelengths);
+      auto lights = construct_spectral_light_sampler();
+      spectral_render(output.data, nx, ny, PPS, sample_wavelengths, world, lights, frame);
+    }
 
     /// PNG出力
     std::ostringstream sout;
