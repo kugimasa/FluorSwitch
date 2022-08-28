@@ -32,7 +32,7 @@ void execute() {
   int ny = 600;
   std::cout << "PPS: " << PPS << std::endl;
   std::cout << "wavelength sample: " << WAVELENGTH_SAMPLE_SIZE << std::endl;
-  std::cout << "OpenMP threads: " << MAX_THREAD_NUM << std::endl;
+  std::cout << "OpenMP threads: " << MAX_THREAD_NUM << " / " << omp_get_max_threads() << std::endl;
   std::cout << "========== Render ==========" << std::endl;
 
   /// BitMap
@@ -48,6 +48,9 @@ void execute() {
 
   // 描画開始
   render_start = std::chrono::system_clock::now();
+  auto rgb_lights = construct_light_sampler();
+  auto spectral_lights = construct_spectral_light_sampler();
+
   for (int frame = 1; frame <= MAX_FRAME; ++frame) {
 //#ifndef NDEBUG
     // 時間計測開始
@@ -66,8 +69,7 @@ void execute() {
     if (frame <= RGB_MAX_FRAME) {
       /// RGBレンダリング
       auto world = construct_scene(frame, RGB_STOP_FRAME, RGB_MAX_FRAME);
-      auto lights = construct_light_sampler();
-      rgb_render(output.data, nx, ny, PPS, world, lights, frame);
+      rgb_render(output.data, nx, ny, PPS, world, rgb_lights, frame);
     } else {
       /// スペクトラルレンダリング
       auto sample_wavelengths = full_wavelengths();
@@ -76,8 +78,7 @@ void execute() {
       auto spectral_frame = frame - RGB_MAX_FRAME;
       auto spectral_max_frame = MAX_FRAME - RGB_MAX_FRAME;
       auto world = construct_spectral_scene(spectral_frame, SPECTRAL_STOP_FRAME, spectral_max_frame, sample_wavelengths);
-      auto lights = construct_spectral_light_sampler();
-      spectral_render(output.data, nx, ny, PPS, sample_wavelengths, world, lights, frame);
+      spectral_render(output.data, nx, ny, PPS, sample_wavelengths, world, spectral_lights, frame);
     }
 
     /// PNG出力
@@ -109,9 +110,11 @@ void execute() {
 
 int main() {
   // 実行開始
-  std::thread timer(program_timer);
-  std::thread exec(execute);
-  timer.join();
-  exec.join();
+  // TODO: 一旦タイマーを外す対応
+  // std::thread timer(program_timer);
+  // std::thread exec(execute);
+  // timer.join();
+  // exec.join();
+  execute();
   return 0;
 }

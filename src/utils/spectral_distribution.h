@@ -186,7 +186,7 @@ const auto emission_spectra = spectral_distribution("./assets/spectra/fluor/qdot
 const auto zero_spectra = spectral_distribution(black_spectra, 0.0);
 const auto full_wavelength_size = d65_spectra.size();
 const auto integral_y = 106.85691688599991; // y_bar.sum()
-#define WAVELENGTH_SAMPLE_SIZE 16
+#define WAVELENGTH_SAMPLE_SIZE 81
 const double inv_wave_pdf_val = (double) x_bar.size() / WAVELENGTH_SAMPLE_SIZE;
 const double sample_factor = inv_wave_pdf_val / integral_y;
 
