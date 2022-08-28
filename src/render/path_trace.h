@@ -8,7 +8,6 @@
 #include "../material/material.h"
 
 color inline path_trace(const ray &r,
-                        const color &background,
                         const hittable<material> &world,
                         shared_ptr<hittable_list<material>> &lights,
                         int depth) {
@@ -16,12 +15,12 @@ color inline path_trace(const ray &r,
 
   /// レイの最大反射後
   if (depth <= 0) {
-    return BLACK;
+    return ZERO;
   }
 
   /// 背景色
   if (!world.hit(r, 0.001, INF, rec)) {
-    return background;
+    return ZERO;
   }
 
   /// レイの反射
@@ -34,7 +33,7 @@ color inline path_trace(const ray &r,
 
   /// 鏡面
   if (s_rec.is_specular) {
-    return s_rec.attenuation * path_trace(s_rec.specular_ray, background, world, lights, depth - 1);
+    return s_rec.attenuation * path_trace(s_rec.specular_ray, world, lights, depth - 1);
   }
 
   auto light_pdf = make_shared<hittable_pdf<material>>(lights, rec.p);
@@ -43,10 +42,32 @@ color inline path_trace(const ray &r,
   ray scattered = ray(rec.p, mixture_pdf.generate(), r.time());
   auto pdf_val = mixture_pdf.value(scattered.direction());
 
-  auto ray_c = path_trace(scattered, background, world, lights, depth - 1);
+  auto ray_c = path_trace(scattered, world, lights, depth - 1);
 
   /// 再起処理
   return emitted + s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c / pdf_val;
+}
+
+void rgb_render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
+                hittable_list<material> world, shared_ptr<hittable_list<material>> &lights,
+                int frame = 1) {
+
+  color col = ZERO;
+  #pragma omp parallel for private(col) schedule(dynamic, 1) num_threads(MAX_THREAD_NUM)
+  for (int j = 0; j < ny; ++j) {
+    for (int i = 0; i < nx; ++i) {
+      col = ZERO;
+      for (int s = 0; s < ns; ++s) {
+        double u = double(i + drand48()) / double(nx);
+        double v = double(j + drand48()) / double(ny);
+        ray r = SCENE_CAMERA.get_ray(u, v);
+        col += path_trace(r, world, lights, MAX_RAY_DEPTH);
+      }
+      col /= double(ns);
+      col = gamma_correct(col);
+      drawPix(data, nx, ny, i, j, col);
+    }
+  }
 }
 
 #endif //RTCAMP2022_SRC_RENDER_PATH_TRACE_H_

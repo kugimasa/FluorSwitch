@@ -26,86 +26,6 @@
 #include "utils/bvh.h"
 #include "sampling/spectral_pdf.h"
 
-// 30fps * 5 sec
-#define MAX_FRAME 1
-#define MAX_THREAD_NUM 8
-#define CHANNEL_NUM 3
-
-void drawPix(unsigned char *data,
-             unsigned int w, unsigned int h,
-             unsigned int x, unsigned int y,
-             const color pix_color) {
-
-  auto r = pix_color.x();
-  auto g = pix_color.y();
-  auto b = pix_color.z();
-
-  unsigned char *p;
-  p = data + (h - y - 1) * w * 3 + x * 3;
-  p[0] = static_cast<unsigned char>(256 * clamp(r, 0.0, 0.999));
-  p[1] = static_cast<unsigned char>(256 * clamp(g, 0.0, 0.999));
-  p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
-}
-
-template<typename color_type, typename mat>
-void render(unsigned char *data, unsigned int nx, unsigned int ny, int ns,
-            color_type background, hittable_list<mat> world, shared_ptr<hittable_list<mat>> &lights,
-            int frame = 1) {
-
-  /// カメラ設定
-  point3 lookfrom(278.0, 278.0, -800.0);
-  point3 lookat(278.0, 278.0, 0.0);
-  double vfov{40.0};
-  double dist_to_focus{10.0};
-  double aperture{0.0};
-  int max_depth = 8;
-  double aspect = double(nx) / double(ny);
-  double t0{0.0}, t1{1.0};
-  camera cam(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
-  spectral_distribution spectra{background, 0.0};
-
-  #pragma omp parallel for private(spectra) schedule(dynamic, 1) num_threads(MAX_THREAD_NUM)
-  for (int j = 0; j < ny; ++j) {
-    for (int i = 0; i < nx; ++i) {
-      for (int s = 0; s < ns; ++s) {
-        spectra = background;
-        double u = double(i + drand48()) / double(nx);
-        double v = double(j + drand48()) / double(ny);
-        ray r = cam.get_ray(u, v);
-        spectra = spectra + spectral_path_trace(r, background, world, lights, max_depth);
-        // col += path_trace(r, background, world, lights, max_depth);
-      }
-#ifndef NDEBUG
-#ifndef _OPENMP
-      progress = double(i + j * nx) / img_size;
-      flush_progress(progress);
-#endif
-#endif
-
-      auto col = spectralToRgb(spectra / ns);
-
-      /// TODO: 関数化
-      auto r = col.x();
-      auto g = col.y();
-      auto b = col.z();
-
-      // NaNを除外
-      // NaN同士の比較は成り立たない
-      if (r != r) r = 0.0;
-      if (b != b) b = 0.0;
-      if (g != g) g = 0.0;
-
-      // サンプル数の平均 + ガンマ補正(gamma=2.0
-      r = sqrt(r);
-      g = sqrt(g);
-      b = sqrt(b);
-
-      col = color(r, g, b);
-      drawPix(data, nx, ny, i, j, col);
-    }
-  }
-}
-
 // メインの処理
 void execute() {
   int nx = 600;
@@ -142,15 +62,18 @@ void execute() {
     /// 背景色の指定
     memset(output.data, 0xFF, output.width * output.height * output.ch);
     /// シーンデータ
-    auto sample_wavelength = random_sample_wavelengths(full_wavelength_size, WAVELENGTH_SAMPLE_SIZE);
-    auto world = construct_spectral_scene(frame, MAX_FRAME, sample_wavelength);
-    auto lights = construct_spectral_light_sampler(frame, MAX_FRAME);
-    /// シーン背景
-    auto background_spectra = spectral_distribution(zero_spectra, sample_wavelength);
-    color background_rgb = BLACK;
+    /// スペクトラルレンダリング
+    // auto sample_wavelengths = full_wavelengths();
+    // auto sample_wavelengths = random_sample_wavelengths();
+    // auto sample_wavelengths = importance_sample_wavelengths();
+    // auto world = construct_spectral_scene(frame, MAX_FRAME, sample_wavelengths);
+    // auto lights = construct_spectral_light_sampler(frame, MAX_FRAME);
+    // spectral_render(output.data, nx, ny, ns, sample_wavelengths, world, lights, frame);
 
-    /// 描画処理
-    render(output.data, nx, ny, ns, background_spectra, world, lights, frame);
+    /// RGBレンダリング
+    auto world = construct_scene(frame, MAX_FRAME);
+    auto lights = construct_light_sampler();
+    rgb_render(output.data, nx, ny, ns, world, lights, frame);
 
     /// PNG出力
     std::ostringstream sout;

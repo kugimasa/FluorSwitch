@@ -18,7 +18,7 @@ class diffuse_light : public material {
     if (rec.front_face) {
       return emit->value(u, v, p);
     } else {
-      return BLACK;
+      return ZERO;
     }
   }
  public:

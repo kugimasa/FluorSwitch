@@ -9,22 +9,7 @@
 #include "../objects/geometry.h"
 #include "../utils/hittable_list.h"
 #include "../utils/bvh.h"
-#include "../sampling/spectral_pdf.h"
-
-#define SPHERE_RADIUS 75
-#define LIGHT_WIDTH 150
-
-inline spectral_distribution calc_fluorescent_pdf() {
-  double inv_k_f = 1 / emission_spectra.sum();
-  double w_f = 4 * M_PI * SPHERE_RADIUS * SPHERE_RADIUS * inv_k_f;
-  return emission_spectra * w_f;
-}
-
-inline spectral_distribution calc_light_pdf() {
-  double inv_k_l = 1 / uv_spectra.sum();
-  double w_l = LIGHT_WIDTH * LIGHT_WIDTH * inv_k_l;
-  return uv_spectra * w_l;
-}
+#include "../utils/util_funcs.h"
 
 inline hittable_list<spectral_material> construct_spectral_scene(int frame, int max_frame, std::vector<size_t> wavelength_indices) {
   hittable_list<spectral_material> world;
@@ -46,7 +31,7 @@ inline hittable_list<spectral_material> construct_spectral_scene(int frame, int 
   cornell_box<spectral_material> cb = cornell_box<spectral_material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list<spectral_material>>(cb));
   /// 移動する球
-  world.add(make_shared<sphere<spectral_material>>(vec3(227.5, 90, 150), SPHERE_RADIUS, fluo_mat));
+  world.add(make_shared<sphere<spectral_material>>(vec3(227.5, SPHERE_RADIUS, 150), SPHERE_RADIUS, fluo_mat));
   return world;
 }
 
@@ -70,6 +55,8 @@ inline hittable_list<material> construct_scene(int frame, int max_frame) {
   auto light_mat = make_shared<diffuse_light>(D65_LIGHT);
   cornell_box<material> cb = cornell_box<material>(555, 150, red_mat, red_mat, white_mat, white_mat, blue_mat, light_mat);
   world.add(make_shared<hittable_list<material>>(cb));
+  /// 移動する球
+  world.add(make_shared<sphere<material>>(vec3(227.5, SPHERE_RADIUS, 150), SPHERE_RADIUS, black_mat));
   return world;
 }
 
@@ -80,7 +67,7 @@ inline shared_ptr<hittable_list<material>> construct_light_sampler() {
   return lights;
 }
 
-
+/// OBJモデル用
 //  std::cout << "+++++++++ Load Obj +++++++++" << std::endl;
 //  // OBJモデルの読み込み
 //  shared_ptr<geometry> obj = make_shared<geometry>("./assets/obj/kugizarashi.obj", glass);

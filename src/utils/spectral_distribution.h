@@ -180,7 +180,7 @@ const auto red_spectra = spectral_distribution("./assets/spectra/macbeth_09_mode
 const auto white_spectra = spectral_distribution("./assets/spectra/macbeth_19_white.csv");
 const auto black_spectra = spectral_distribution("./assets/spectra/macbeth_24_black.csv");
 const auto d65_spectra = spectral_distribution("./assets/spectra/cie_si_d65.csv");
-const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv") * 500;
+const auto uv_spectra = spectral_distribution("./assets/spectra/black_light.csv");
 const auto excitation_spectra = spectral_distribution("./assets/spectra/fluor/qdot545in.csv");
 const auto emission_spectra = spectral_distribution("./assets/spectra/fluor/qdot545out.csv");
 const auto zero_spectra = spectral_distribution(black_spectra, 0.0);
@@ -202,18 +202,22 @@ color inline spectralToRgb(const spectral_distribution &distribution) {
   for (size_t index = 0; index < wavelength_size; ++index) {
     size_t lambda = distribution.get_wavelength(index);
     color xyz = getXYZFromWavelength(lambda);
-    X += distribution.get_intensity(index) * xyz.x() * sample_factor;
-    Y += distribution.get_intensity(index) * xyz.y() * sample_factor;
-    Z += distribution.get_intensity(index) * xyz.z() * sample_factor;
+    X += distribution.get_intensity(index) * xyz.x();
+    Y += distribution.get_intensity(index) * xyz.y();
+    Z += distribution.get_intensity(index) * xyz.z();
   }
+  X *= sample_factor;
+  Y *= sample_factor;
+  Z *= sample_factor;
   vec3 XYZ{X, Y, Z};
   /// srgb_d65
   return {dot(srgb_d65_vec0, XYZ), dot(srgb_d65_vec1, XYZ), dot(srgb_d65_vec2, XYZ)};
 }
 
-static auto MACBETH_BLUE = spectralToRgb(blue_spectra);
-static auto MACBETH_RED = spectralToRgb(red_spectra);
-static auto MACBETH_WHITE = spectralToRgb(white_spectra);
-static auto MACBETH_BLACK = spectralToRgb(black_spectra);
-static auto D65_LIGHT = spectralToRgb(d65_spectra);
+static auto MACBETH_BLUE = color{80.0 / 255.0, 91.0 / 255.0, 166.0 / 255.0};
+static auto MACBETH_RED = color{193.0 / 255.0, 90.0 / 255.0, 99.0 / 255.0};
+static auto MACBETH_WHITE = color{243.0 / 255.0, 243.0 / 255.0, 242.0 / 255.0};
+static auto MACBETH_BLACK = color{52.0 / 255.0, 52.0 / 255.0, 52.0 / 255.0};
+double d65_scale = 0.07;
+static auto D65_LIGHT = color{115.23833907097818 * d65_scale, 115.25606217972482 * d65_scale, 115.24785430618556 * d65_scale}; // spectralToRgb(d65_spectra);
 #endif //RTCAMP2022_SRC_UTILS_SPECTRAL_DISTRIBUTION_H_

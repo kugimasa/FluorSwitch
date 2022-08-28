@@ -65,4 +65,14 @@ class camera {
   double time1{0.0};
   double lens_radius;
 };
+
+/// globalなカメラ設定
+point3 lookfrom(278.0, 278.0, -800.0);
+point3 lookat(278.0, 278.0, 0.0);
+double vfov{40.0};
+double dist_to_focus{10.0};
+double aperture{0.0};
+double aspect = 1.0;
+double t0{0.0}, t1{1.0};
+camera SCENE_CAMERA(lookfrom, lookat, Y_UP, vfov, aspect, aperture, dist_to_focus, t0, t1);
 #endif //RAY_CAMERA_CAMERA_H_

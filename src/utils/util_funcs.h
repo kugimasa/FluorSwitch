@@ -66,4 +66,49 @@ inline void program_timer() {
 #include "vec3.h"
 #include "colors.h"
 
+// 30fps * 5 sec
+#define MAX_FRAME 1
+#define MAX_THREAD_NUM 8
+#define MAX_RAY_DEPTH 8
+#define CHANNEL_NUM 3
+
+// シーン用の情報
+#define SPHERE_RADIUS 75
+#define LIGHT_WIDTH 150
+
+inline color gamma_correct(const color col) {
+  auto r = col.x();
+  auto g = col.y();
+  auto b = col.z();
+
+  // NaNを除外
+  // NaN同士の比較は成り立たない
+  if (r != r) r = 0.0;
+  if (b != b) b = 0.0;
+  if (g != g) g = 0.0;
+
+  // サンプル数の平均 + ガンマ補正(gamma=2.0
+  r = sqrt(r);
+  g = sqrt(g);
+  b = sqrt(b);
+
+  return {r, g, b};
+}
+
+inline void drawPix(unsigned char *data,
+                    unsigned int w, unsigned int h,
+                    unsigned int x, unsigned int y,
+                    const color pix_color) {
+
+  auto r = pix_color.x();
+  auto g = pix_color.y();
+  auto b = pix_color.z();
+
+  unsigned char *p;
+  p = data + (h - y - 1) * w * 3 + x * 3;
+  p[0] = static_cast<unsigned char>(256 * clamp(r, 0.0, 0.999));
+  p[1] = static_cast<unsigned char>(256 * clamp(g, 0.0, 0.999));
+  p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
+}
+
 #endif //RTCAMP2022_SRC_UTILS_UTIL_FUNCS_H_
