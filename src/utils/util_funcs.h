@@ -66,7 +66,7 @@ inline void program_timer() {
 #include "vec3.h"
 #include "colors.h"
 
-#define RGB_PPS 15 // 15
+#define RGB_PPS 24 // 15
 #define SPECTRAL_PPS 8 // 8
 #define RGB_STOP_FRAME 5
 #define RGB_MAX_FRAME 60

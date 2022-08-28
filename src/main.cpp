@@ -55,7 +55,7 @@ void execute() {
   // 波長はフルセットを使用
   auto sample_wavelengths = full_wavelengths();
 
-  for (int frame = 61; frame <= MAX_FRAME; ++frame) {
+  for (int frame = 1; frame <= MAX_FRAME; ++frame) {
 //#ifndef NDEBUG
     // 時間計測開始
     start = std::chrono::system_clock::now();
