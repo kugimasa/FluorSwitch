@@ -85,7 +85,7 @@ inline void program_timer() {
 #define UV_LIGHT_ON_FRAME 60
 #define MAX_FRAME 100
 
-#define SPHERE_RGB_START_X 200
+#define SPHERE_RGB_START_X 55
 #define SPHERE_SPECTRAL_START_X (545 - 2.5 * SPHERE_RADIUS)
 #define SPHERE_SPECTRAL_END_X 300
 

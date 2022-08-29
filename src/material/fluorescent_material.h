@@ -35,7 +35,7 @@ class fluorescent_material : public spectral_material {
     return cos < 0 ? 0 : cos * M_1_PI;
   }
 
-  double eta = 150.0;
+  double eta = 1.0;
   spectral_distribution albedo;
   spectral_distribution sample_excitation;
   spectral_distribution sample_emission;

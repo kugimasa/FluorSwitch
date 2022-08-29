@@ -22,7 +22,7 @@ class cornell_box : public hittable_list<mat> {
     this->objects.push_back(make_shared<xy_rect<mat>>(0, box_size, 0, box_size, box_size, back_mat));
 
     /// 光源
-    double x_0 = (box_size - light_size) / 2;
+    double x_0 = (box_size - light_size) / 2.0;
     double x_1 = x_0 + light_size;
     auto diffuse_light = make_shared<flip_face<mat>>(make_shared<xz_rect<mat>>(x_0, x_1, x_0, x_1, box_size - 1, light_mat));
     this->objects.push_back(diffuse_light);

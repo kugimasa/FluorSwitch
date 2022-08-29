@@ -81,7 +81,8 @@ inline hittable_list<material> construct_scene(int frame, int max_frame) {
   } else if (RGB_LIGHT_OFF_FRAME <= frame) {
     light_on = false;
     move_t = (double) (frame - RGB_LIGHT_OFF_FRAME) / (double) (max_frame - RGB_LIGHT_OFF_FRAME); // [0, 1]
-    light_t = (1 - move_t) * (1 - move_t) * (1 - move_t) * (1 - move_t) * (1 - move_t); // [1, 0] easeInQuint
+    light_t = ffmax((1 - move_t), 0.06);
+    light_t = light_t * light_t * light_t * light_t * light_t; // [1, 0] easeInQuint
   }
 
   /// 光源設定

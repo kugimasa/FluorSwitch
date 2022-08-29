@@ -40,12 +40,12 @@ spectral_distribution inline spectral_path_trace(const ray &r,
 
   auto ray_c = spectral_path_trace(scattered, world, lights, depth - 1);
   /// TODO: 波長に対しての係数は必要???
-  auto reflectance_spectra = s_s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val;
+  auto reflectance_spectra = s_s_rec.attenuation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val * inv_wave_pdf_val;
 
   /// 蛍光の場合
   if (s_s_rec.is_fluor) {
-    auto K = s_s_rec.excitation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val * inv_wave_pdf_val;
-    return emitted + reflectance_spectra + s_s_rec.emission * K.sum() / WAVELENGTH_SAMPLE_SIZE;
+    auto K = s_s_rec.excitation * rec.mat_ptr->scattering_pdf(r, rec, scattered) * ray_c * inv_pdf_val;
+    return emitted + reflectance_spectra + s_s_rec.emission * K.sum() * inv_wave_pdf_val;
   }
 
   /// 再起処理
