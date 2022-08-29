@@ -66,11 +66,11 @@ inline void program_timer() {
 #include "vec3.h"
 #include "colors.h"
 
-#define RGB_PPS 24 // 15
-#define SPECTRAL_PPS 8 // 8
+#define RGB_PPS 15 // 15 => 24
+#define SPECTRAL_PPS 16 // 8
 #define MAX_THREAD_NUM 1
-#define RGB_MAX_RAY_DEPTH 8 // 8
-#define SPECTRAL_MAX_RAY_DEPTH 4 // 8
+#define RGB_MAX_RAY_DEPTH 50 // 8
+#define SPECTRAL_MAX_RAY_DEPTH 50 // 8
 #define CHANNEL_NUM 3
 
 // シーン用の情報
@@ -119,9 +119,9 @@ inline void drawPix(unsigned char *data,
 
   unsigned char *p;
   p = data + (h - y - 1) * w * 3 + x * 3;
-  p[0] = static_cast<unsigned char>(256 * clamp(r, 0.0, 0.999));
-  p[1] = static_cast<unsigned char>(256 * clamp(g, 0.0, 0.999));
-  p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.999));
+  p[0] = static_cast<unsigned char>(256 * clamp(r, 0.0, 0.99));
+  p[1] = static_cast<unsigned char>(256 * clamp(g, 0.0, 0.99));
+  p[2] = static_cast<unsigned char>(256 * clamp(b, 0.0, 0.99));
 }
 
 #endif //FLUORSWITCH_SRC_UTILS_UTIL_FUNCS_H_
