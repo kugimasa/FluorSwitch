@@ -31,10 +31,10 @@ color inline path_trace(const ray &r,
   if (!rec.mat_ptr->scatter(r, rec, s_rec))
     return emitted;
 
-  /// 鏡面
-  if (s_rec.is_specular) {
-    return s_rec.attenuation * path_trace(s_rec.specular_ray, world, lights, depth - 1);
-  }
+  /// 鏡面(今回のシーンには無いのでコメントアウト)
+//  if (s_rec.is_specular) {
+//    return s_rec.attenuation * path_trace(s_rec.specular_ray, world, lights, depth - 1);
+//  }
 
   auto light_pdf = make_shared<hittable_pdf<material>>(lights, rec.p);
   mixture_pdf mixture_pdf(light_pdf, s_rec.pdf_ptr);
